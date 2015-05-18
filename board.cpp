@@ -60,7 +60,7 @@ void display_board(Player *p1, Player *p2) {
 			cout << "\x1b[43m" << " ";
 		}
 		if (!((i+1) % 4))
-			cout << "\x1b[0m" << " " << oddrow << endl;
+			cout << "\x1b[0m" << endl;
 	}
 	cout << endl;
 }
