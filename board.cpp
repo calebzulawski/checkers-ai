@@ -34,32 +34,33 @@ void display_board(Player *p1, Player *p2) {
 	string p1Color = p1->white ? "\x1b[37m" : "\x1b[30m";
 	string p2Color = p2->white ? "\x1b[37m" : "\x1b[30m";
 	string backgroundColor;
-	int offset;
-	for (int i = 0; i < 64; i++) {
-		offset = (i - (i % 8) + 1 / 8) % 2 ? 1 : 0;
-		if ((i + offset) % 2) {
+	bool oddrow;
+	for (int i = 0; i < 32; i++) {
+		oddrow = (((i - (i % 4))/4) % 2);
+		if (!oddrow) {
 			cout << "\x1b[43m" << " ";
 		}
-		else {
-			cout << "\x1b[41m";
-			if (p1->kings & (1 << ((i - offset)/2))) {
-				cout << p1Color << "k";
-			}
-			else if (p2->kings & (1 << ((i - offset)/2))) {
-				cout << p2Color << "k";
-			}
-			else if (p1->pieces & (1 << ((i - offset)/2))) {
-				cout << p1Color << "1";
-			}
-			else if (p2->pieces & (1 << ((i - offset)/2))) {
-				cout << p2Color << "2";
-			}
-			else {
-				cout << " ";
-			}
+		cout << "\x1b[41m";
+		if (p1->kings & (1 << i)) {
+			cout << p1Color << "@";
 		}
-		if (!((i+1) % 8))
-			cout << "\x1b[0m" << endl;
+		else if (p2->kings & (1 << i)) {
+			cout << p2Color << "@";
+		}
+		else if (p1->pieces & (1 << i)) {
+			cout << p1Color << "O";
+		}
+		else if (p2->pieces & (1 << i)) {
+			cout << p2Color << "O";
+		}
+		else {
+			cout << " ";
+		}
+		if (oddrow) {
+			cout << "\x1b[43m" << " ";
+		}
+		if (!((i+1) % 4))
+			cout << "\x1b[0m" << " " << oddrow << endl;
 	}
 	cout << endl;
 }
