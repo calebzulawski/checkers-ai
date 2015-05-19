@@ -2,6 +2,8 @@
 #include <iostream>
 #include "board.hpp"
 
+#define CHECK(field,bit) ((field) & (1 << bit))
+
 Player::Player(bool white) {
 	if (white) {
 		initWhite();
@@ -21,6 +23,18 @@ void Player::initBlack() {
 	pieces = 0xFFF00000;
 	kings = 0;
 	white = false;
+}
+
+bool Player::checkWhite(int pos) {
+	return (pieces & (1 << pos)) && (white || (kings & (1 << pos)));
+}
+
+bool Player::checkBlack(int pos) {
+	return (pieces & (1 << pos)) && (!white || (kings & (1 << pos)));
+}
+
+bool Player::check(int pos) {
+	return (pieces & (1 << pos));
 }
 
 class Move {
@@ -44,13 +58,13 @@ void display_board(Player *p1, Player *p2) {
 		if (p1->kings & (1 << i)) {
 			cout << p1Color << "@";
 		}
-		else if (p2->kings & (1 << i)) {
+		else if CHECK(p2->kings, i) {
 			cout << p2Color << "@";
 		}
-		else if (p1->pieces & (1 << i)) {
+		else if CHECK(p1->pieces, i) {
 			cout << p1Color << "O";
 		}
-		else if (p2->pieces & (1 << i)) {
+		else if CHECK(p2->pieces, i) {
 			cout << p2Color << "O";
 		}
 		else {
@@ -63,4 +77,52 @@ void display_board(Player *p1, Player *p2) {
 			cout << "\x1b[0m" << endl;
 	}
 	cout << endl;
+}
+
+void possible_moves(Player *mP, Player *oP, int *moveList) {
+	int idx = 0;
+	int oddrow;
+	int posInRow;
+	for(int i=0; i < 32; i++) {
+		oddrow = (((i - (i % 4))/4) % 2);
+		posInRow = i % 4;
+		if (mP->checkWhite(i)) {
+			if (posInRow < 3 && !oddrow && !oP->check(i+5) && !mP->check(i+5) && i < 27) {
+				idx++;
+				// i + 5
+			}
+			if (!oddrow && !mP->check(i+4) && !oP->check(i+4) && i < 27) {
+				idx++;
+				// i + 4
+			}
+			if (posInRow > 0 && oddrow && !oP->check(i+3) && !mP->check(i+3) && i < 27) {
+				idx++;
+				// i + 3
+			}
+			if (oddrow && !mP->check(i+4) && !oP->check(i+4) && i < 27) {
+				idx++;
+				// i + 4
+			}
+			//TODO: Jumps
+		}
+		if (mP->checkBlack(i)) {
+			if (posInRow < 3 && !oddrow && !oP->check(i-3) && !mP->check(i-3) && i > 3) {
+				idx++;
+				// i - 3
+			}
+			if (!oddrow && !mP->check(i-4) && !oP->check(i-4) && i > 3) {
+				idx++;
+				// i - 4
+			}
+			if (posInRow > 0 && oddrow && !oP->check(i-5) && !mP->check(i-5) && i > 3) {
+				idx++;
+				// i - 5
+			}
+			if (oddrow && !mP->check(i-4) && !oP->check(i-4) && i > 3) {
+				idx++;
+				// i - 4
+			}
+			//TODO: Jumps
+		}
+	}
 }

@@ -13,9 +13,14 @@ public:
 	bool white;
 	void initWhite();
 	void initBlack();
+	bool checkWhite(int pos);
+	bool checkBlack(int pos);
+	bool check(int pos);
 	Player(bool white);
 };
 
 void display_board(Player *p1, Player *p2);
+
+void possible_moves(Player *mP, Player *oP, int *moveList);
 
 #endif /* BOARD_H */
