@@ -90,7 +90,7 @@ void possible_moves(Player *mP, Player *oP, vector<vector<Move*>* > *moveList) {
 				moveList->push_back(new vector<Move*>(1,newMove));
 				// i + 5
 			}
-			if (!oddrow && !mP->check(i+4) && !oP->check(i+4) && i < 27) {
+			if (!oddrow && !(mP->check(i+4)) && !(oP->check(i+4)) && i < 27) {
 				auto newMove = new Move(i,i+4);
 				moveList->push_back(new vector<Move*>(1,newMove));
 				// i + 4
