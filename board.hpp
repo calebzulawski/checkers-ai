@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -19,8 +20,15 @@ public:
 	Player(bool white);
 };
 
+class Move {
+public:
+	int startIdx;
+	int endIdx;
+	Move(int startIdx, int endIdx);	
+};
+
 void display_board(Player *p1, Player *p2);
 
-void possible_moves(Player *mP, Player *oP, int *moveList);
+void possible_moves(Player *mP, Player *oP, vector<vector<Move*>* > *moveList);
 
 #endif /* BOARD_H */
