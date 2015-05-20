@@ -55,6 +55,10 @@ Move::Move(int sIdx, int eIdx, Player *mP, Player *oP) {
 		mPieces &= ~(1 << startIdx);
 		mKings &= ~(1 << startIdx);
 	}
+	// Implement jumps
+
+	// King me
+	mKings |= (mP->white ? 0xF0000000 : 0x0000000F) & mPieces;
 }
 
 void display_board(Player *p1, Player *p2) {
