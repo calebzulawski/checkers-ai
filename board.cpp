@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdlib.h>
 #include <iostream>
 #include <vector>
 #include "board.hpp"
@@ -38,9 +39,22 @@ bool Player::check(int pos) {
 	return (pieces & (1 << pos));
 }
 
-Move::Move(int sIdx, int eIdx) {
+Move::Move(int sIdx, int eIdx, Player *mP, Player *oP) {
 	startIdx = sIdx;
 	endIdx = eIdx;
+	mPieces = mP->pieces;
+	mKings = mP->kings;
+	oPieces = oP->pieces;
+	oKings = oP->kings;
+	if (abs(startIdx - endIdx) < 7) {
+		// Set new bits
+		mPieces |= 1 << endIdx;
+		// Check and set if king
+		mKings |= ((mKings >> startIdx) & 1) << endIdx;
+		// Clear old bits
+		mPieces &= ~(1 << startIdx);
+		mKings &= ~(1 << startIdx);
+	}
 }
 
 void display_board(Player *p1, Player *p2) {
@@ -86,22 +100,22 @@ void possible_moves(Player *mP, Player *oP, vector<vector<Move*>* > *moveList) {
 		posInRow = i % 4;
 		if (mP->checkWhite(i)) {
 			if (posInRow < 3 && !oddrow && !oP->check(i+5) && !mP->check(i+5) && i < 27) {
-				auto newMove = new Move(i,i+5);
+				auto newMove = new Move(i,i+5,mP,oP);
 				moveList->push_back(new vector<Move*>(1,newMove));
 				// i + 5
 			}
 			if (!oddrow && !(mP->check(i+4)) && !(oP->check(i+4)) && i < 27) {
-				auto newMove = new Move(i,i+4);
+				auto newMove = new Move(i,i+4,mP,oP);
 				moveList->push_back(new vector<Move*>(1,newMove));
 				// i + 4
 			}
 			if (posInRow > 0 && oddrow && !oP->check(i+3) && !mP->check(i+3) && i < 27) {
-				auto newMove = new Move(i,i+3);
+				auto newMove = new Move(i,i+3,mP,oP);
 				moveList->push_back(new vector<Move*>(1,newMove));
 				// i + 3
 			}
 			if (oddrow && !mP->check(i+4) && !oP->check(i+4) && i < 27) {
-				auto newMove = new Move(i,i+4);
+				auto newMove = new Move(i,i+4,mP,oP);
 				moveList->push_back(new vector<Move*>(1,newMove));
 				// i + 4
 			}
@@ -109,22 +123,22 @@ void possible_moves(Player *mP, Player *oP, vector<vector<Move*>* > *moveList) {
 		}
 		if (mP->checkBlack(i)) {
 			if (posInRow < 3 && !oddrow && !oP->check(i-3) && !mP->check(i-3) && i > 3) {
-				auto newMove = new Move(i,i-3);
+				auto newMove = new Move(i,i-3,mP,oP);
 				moveList->push_back(new vector<Move*>(1,newMove));
 				// i - 3
 			}
 			if (!oddrow && !mP->check(i-4) && !oP->check(i-4) && i > 3) {
-				auto newMove = new Move(i,i-4);
+				auto newMove = new Move(i,i-4,mP,oP);
 				moveList->push_back(new vector<Move*>(1,newMove));
 				// i - 4
 			}
 			if (posInRow > 0 && oddrow && !oP->check(i-5) && !mP->check(i-5) && i > 3) {
-				auto newMove = new Move(i,i-5);
+				auto newMove = new Move(i,i-5,mP,oP);
 				moveList->push_back(new vector<Move*>(1,newMove));
 				// i - 5
 			}
 			if (oddrow && !mP->check(i-4) && !oP->check(i-4) && i > 3) {
-				auto newMove = new Move(i,i-4);
+				auto newMove = new Move(i,i-4,mP,oP);
 				moveList->push_back(new vector<Move*>(1,newMove));
 				// i - 4
 			}
@@ -132,3 +146,4 @@ void possible_moves(Player *mP, Player *oP, vector<vector<Move*>* > *moveList) {
 		}
 	}
 }
+
