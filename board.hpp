@@ -35,4 +35,6 @@ void display_board(Player *p1, Player *p2);
 
 void possible_moves(Player *mP, Player *oP, vector<vector<Move*>* > *moveList);
 
+bool possible_jumps(Player *mP, Player *oP, vector<vector<Move*>* > *moveList, vector<Move*> *currentMove);
+
 #endif /* BOARD_H */

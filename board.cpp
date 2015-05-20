@@ -97,11 +97,21 @@ void display_board(Player *p1, Player *p2) {
 }
 
 void possible_moves(Player *mP, Player *oP, vector<vector<Move*>* > *moveList) {
+	moveList->clear();
 	int oddrow;
 	int posInRow;
+	bool jumpFound = false;
 	for(int i=0; i < 32; i++) {
 		oddrow = (((i - (i % 4))/4) % 2);
 		posInRow = i % 4;
+		// Jumps
+		jumpFound = jumpFound || possible_jumps(mP, oP, moveList, NULL);
+
+		if (jumpFound) {
+			// Skip non-jump moves
+			continue;
+		}
+		// Non-jump moves
 		if (mP->checkWhite(i)) {
 			if (posInRow < 3 && !oddrow && !oP->check(i+5) && !mP->check(i+5) && i < 27) {
 				auto newMove = new Move(i,i+5,mP,oP);
@@ -123,7 +133,6 @@ void possible_moves(Player *mP, Player *oP, vector<vector<Move*>* > *moveList) {
 				moveList->push_back(new vector<Move*>(1,newMove));
 				// i + 4
 			}
-			//TODO: Jumps
 		}
 		if (mP->checkBlack(i)) {
 			if (posInRow < 3 && !oddrow && !oP->check(i-3) && !mP->check(i-3) && i > 3) {
@@ -146,8 +155,28 @@ void possible_moves(Player *mP, Player *oP, vector<vector<Move*>* > *moveList) {
 				moveList->push_back(new vector<Move*>(1,newMove));
 				// i - 4
 			}
-			//TODO: Jumps
 		}
 	}
 }
 
+bool possible_jumps(Player *mP, Player *oP, vector<vector<Move*>* > *moveList, vector<Move*> *currentMove) {
+	bool jumpsFound = false;
+
+	if (currentMove) {
+		uint32_t mPieces = currentMove->back()->mPieces;
+		uint32_t mKings = currentMove->back()->mKings;
+		uint32_t oPieces = currentMove->back()->oPieces;
+		uint32_t oKings = currentMove->back()->oKings;
+	} else {
+		uint32_t mPieces = mP->pieces;
+		uint32_t mKings = mP->kings;
+		uint32_t oPieces = oP->pieces;
+		uint32_t oKings = oP->kings;
+	}
+
+	// Do jump finding stuff and add to "currentMove" vector (or create in case of NULL pointer)
+
+	if (!jumpsFound && !currentMove) {
+		moveList->push_back(currentMove);
+	}
+}
