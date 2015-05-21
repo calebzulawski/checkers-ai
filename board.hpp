@@ -36,7 +36,9 @@ void display_board(Player *p1, Player *p2);
 
 void possible_moves(Player *mP, Player *oP, vector<vector<Move*>* > *moveList, Move *currentMove);
 
-void possible_jumps(Player *mP, Player *oP, vector<vector<Move*>* > *moveList, vector<Move*> *currentMove);
+void possible_jumps(Player *mP, Player *oP, vector<vector<Move*>* > *moveList);
+
+void multiple_jumps(Player *mPin, Player *oPin, vector<vector<Move*>* > *moveList, vector<Move*> *currentMove);
 
 void movelist_gc(vector<vector<Move*>* > *moveList);
 

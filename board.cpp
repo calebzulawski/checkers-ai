@@ -119,7 +119,7 @@ void possible_moves(Player *mPin, Player *oPin, vector<vector<Move*>* > *moveLis
 	int posInRow;
 
 	movelist_gc(moveList);
-	possible_jumps(mP, oP, moveList, NULL);
+	possible_jumps(mP, oP, moveList);
 
 	if (moveList->size() == 0) {
 		for(int i=0; i < 32; i++) {
@@ -169,23 +169,8 @@ void possible_moves(Player *mPin, Player *oPin, vector<vector<Move*>* > *moveLis
 	delete oP;
 }
 
-void possible_jumps(Player *mPin, Player *oPin, vector<vector<Move*>* > *moveList, vector<Move*> *currentMove) {
-	auto mP = new Player(mPin->white);
-	auto oP = new Player(oPin->white);
+void possible_jumps(Player *mP, Player *oP, vector<vector<Move*>* > *moveList) {
 	auto jumpVector = new vector<Move*>(0);
-	if (currentMove) {
-		cout << ( currentMove->back()->startIdx) << endl;
-		cout << ( currentMove->back()->endIdx) << endl;
-		mP->pieces = currentMove->back()->mPieces;
-		mP->kings = currentMove->back()->mKings;
-		oP->pieces = currentMove->back()->oPieces;
-		oP->kings = currentMove->back()->oKings;
-	} else {
-		mP->pieces = mPin->pieces;
-		mP->kings = mPin->kings;
-		oP->pieces = oPin->pieces;
-		oP->kings = oPin->kings;
-	}
 
 	// Do jump finding stuff and add to "currentMove" vector (or create in case of NULL pointer)
 	int oddrow;
@@ -241,31 +226,89 @@ void possible_jumps(Player *mPin, Player *oPin, vector<vector<Move*>* > *moveLis
 		}
 	}
 
-	if (jumpVector->size() == 0 && currentMove) {
-		moveList->push_back(currentMove);
+	for(uint i=0; i < jumpVector->size(); i++) {
+		auto tempMoveVec = new vector<Move*>(1,(*jumpVector)[i]);
+		multiple_jumps(mP, oP, moveList,tempMoveVec);
 	}
 
-	for(uint i=0; i < jumpVector->size(); i++) {
-		if (currentMove) {
+	delete jumpVector;
+}
+
+void multiple_jumps(Player *mPin, Player *oPin, vector<vector<Move*>* > *moveList, vector<Move*> *currentMove) {
+	auto mP = new Player(mPin->white);
+	auto oP = new Player(oPin->white);
+	mP->pieces = currentMove->back()->mPieces;
+	mP->kings = currentMove->back()->mKings;
+	oP->pieces = currentMove->back()->oPieces;
+	oP->kings = currentMove->back()->oKings;
+
+	auto jumpVector = new vector<Move*>(0);
+
+	// Check only piece that just jumped!
+	int i = currentMove->back()->endIdx;
+	int oddrow = (((i - (i % 4))/4) % 2);
+	int posInRow = i % 4;
+
+	// Non-jump moves
+	if (mP->checkWhite(i)) {
+		if (posInRow < 3 && !oddrow && oP->check(i+5) && !oP->check(i+9) && !mP->check(i+9) && i < 24) {
+			auto newMove = new Move(i,i+9,mP,oP);
+			newMove->jump(i+5);
+			jumpVector->push_back(newMove);
+		}
+		if (posInRow > 0 && !oddrow && oP->check(i+4) && !mP->check(i+7) && !oP->check(i+7) && i < 24) {
+			auto newMove = new Move(i,i+7,mP,oP);
+			newMove->jump(i+4);
+			jumpVector->push_back(newMove);
+		}
+		if (posInRow < 3 && oddrow && oP->check(i+4) && !oP->check(i+9) && !mP->check(i+9) && i < 24) {
+			auto newMove = new Move(i,i+9,mP,oP);
+			newMove->jump(i+4);
+			jumpVector->push_back(newMove);
+		}
+		if (posInRow > 0 && oddrow && oP->check(i+3) && !mP->check(i+7) && !oP->check(i+7) && i < 24) {
+			auto newMove = new Move(i,i+7,mP,oP);
+			newMove->jump(i+3);
+			jumpVector->push_back(newMove);
+		}
+	}
+	if (mP->checkBlack(i)) {
+		if (posInRow < 3 && !oddrow && oP->check(i-3) && !oP->check(i-7) && !mP->check(i-7) && i > 7) {
+			auto newMove = new Move(i,i-7,mP,oP);
+			newMove->jump(i-3);
+			jumpVector->push_back(newMove);
+		}
+		if (posInRow > 0 && !oddrow && oP->check(i-4) && !mP->check(i-9) && !oP->check(i-9) && i > 7) {
+			auto newMove = new Move(i,i-9,mP,oP);
+			newMove->jump(i-4);
+			jumpVector->push_back(newMove);
+		}
+		if (posInRow < 3 && oddrow && oP->check(i-4) && !oP->check(i-7) && !mP->check(i-7) && i > 7) {
+			auto newMove = new Move(i,i-7,mP,oP);
+			newMove->jump(i-4);
+			jumpVector->push_back(newMove);
+		}
+		if (posInRow > 0 && oddrow && oP->check(i-5) && !mP->check(i-9) && !oP->check(i-9) && i > 7) {
+			auto newMove = new Move(i,i-9,mP,oP);
+			newMove->jump(i-5);
+			jumpVector->push_back(newMove);
+		}
+	}
+
+	if (jumpVector->size() == 0) {
+		moveList->push_back(currentMove);
+	} else {
+		for (uint i=0; i < jumpVector->size(); i++) {
 			auto tempMoveVec = new vector<Move*>(currentMove->size());
 			for(uint j=0; j < tempMoveVec->size(); j++) {
 				(*tempMoveVec)[j] = (*currentMove)[j]; 
 			}
 			tempMoveVec->push_back((*jumpVector)[i]);
-			possible_jumps(mP,oP,moveList,tempMoveVec);
-		} else {
-			auto tempMoveVec = new vector<Move*>(1,(*jumpVector)[i]);
-			possible_jumps(mP,oP,moveList,tempMoveVec);
+			multiple_jumps(mP, oP, moveList,tempMoveVec);
 		}
-		
-	}
-
-	if (jumpVector->size() > 0 && currentMove) {
 		delete currentMove;
 	}
 
-	delete mP;
-	delete oP;
 	delete jumpVector;
 }
 
