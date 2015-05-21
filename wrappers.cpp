@@ -4,7 +4,7 @@
 #include "wrappers.hpp"
 
 Move* PlayerWrapper::get_move(Player *opponent) {
-	cout << (white ? "White" : "Black") << " - " << (human ? "Human" : "Computer") << " turn";
+	cout << (white ? "White" : "Black") << " - " << (human ? "Human" : "Computer") << " turn" << endl;
 	if (human) {
 		while(true) {
 			auto moveList = new vector<vector<Move*>* >(0);
@@ -84,7 +84,7 @@ GameWrapper::GameWrapper(bool blackAI, bool whiteAI) {
 }
 
 void GameWrapper::evaluate_turn() {
-	Move *newMove;
+	Move *nextMove;
 	if (blackTurn) {
 		nextMove = blackPlayer->get_move(whitePlayer->player);
 		if (nextMove) {
@@ -92,7 +92,7 @@ void GameWrapper::evaluate_turn() {
 			whitePlayer->update(nextMove, false);
 		} else {
 			cout << "White wins!" << endl;
-			exit(0);
+			done = true;
 		}
 	} else {
 		nextMove = whitePlayer->get_move(blackPlayer->player);
@@ -101,7 +101,16 @@ void GameWrapper::evaluate_turn() {
 			blackPlayer->update(nextMove, false);
 		} else {
 			cout << "Black wins!" << endl;
-			exit(0);
+			done = true;
 		}
+	}
+	blackTurn = !blackTurn;
+}
+
+void GameWrapper::run() {
+	display_board(whitePlayer->player, blackPlayer->player);
+	while(!done) {
+		evaluate_turn();
+		display_board(whitePlayer->player, blackPlayer->player);
 	}
 }

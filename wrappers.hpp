@@ -13,11 +13,13 @@ public:
 
 class GameWrapper {
 public:
+	bool done = false;
 	bool blackTurn = true;
-	PlayerWrapper blackPlayer;
-	PlayerWrapper whitePlayer;
-	GameWrapper(bool blackAI, bool whiteAI);
+	PlayerWrapper *blackPlayer;
+	PlayerWrapper *whitePlayer;
 	void evaluate_turn();
+	void run();
+	GameWrapper(bool blackAI, bool whiteAI);
 };
 
 #endif /* WRAPPERS_H */
