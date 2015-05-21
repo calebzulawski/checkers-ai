@@ -9,6 +9,10 @@ Move* PlayerWrapper::get_move(Player *opponent) {
 		while(true) {
 			auto moveList = new vector<vector<Move*>* >(0);
 			possible_moves(player,opponent,moveList,NULL);
+			
+			if (moveList->size() == 0)
+				return NULL;
+			
 			int startIdx;
 			int endIdx;
 			cout << "Select piece: ";
@@ -57,7 +61,47 @@ Move* PlayerWrapper::get_move(Player *opponent) {
 	} else {
 		auto moveList = new vector<vector<Move*>* >(0);
 		possible_moves(player,opponent,moveList,NULL);
+		if (moveList->size() == 0)
+			return NULL;
 		return (*moveList)[rand() % moveList->size()]->back();
 	}
 }
 
+PlayerWrapper::PlayerWrapper(bool whiteArg, bool humanArg) {
+	white = whiteArg;
+	human = humanArg;
+	player = new Player(white);
+}
+
+void PlayerWrapper::update(Move *move, bool active) {
+	player->pieces = (active ? move->mPieces : move->oPieces);
+	player->kings = (active ? move->mKings : move->oKings);
+}
+
+GameWrapper::GameWrapper(bool blackAI, bool whiteAI) {
+	blackPlayer = new PlayerWrapper(false, blackAI);
+	whitePlayer = new PlayerWrapper(true, whiteAI);
+}
+
+void GameWrapper::evaluate_turn() {
+	Move *newMove;
+	if (blackTurn) {
+		nextMove = blackPlayer->get_move(whitePlayer->player);
+		if (nextMove) {
+			blackPlayer->update(nextMove, true);
+			whitePlayer->update(nextMove, false);
+		} else {
+			cout << "White wins!" << endl;
+			exit(0);
+		}
+	} else {
+		nextMove = whitePlayer->get_move(blackPlayer->player);
+		if (nextMove) {
+			whitePlayer->update(nextMove, true);
+			blackPlayer->update(nextMove, false);
+		} else {
+			cout << "Black wins!" << endl;
+			exit(0);
+		}
+	}
+}
