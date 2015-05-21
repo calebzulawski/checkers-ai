@@ -61,8 +61,8 @@ Move::Move(int sIdx, int eIdx, Player *mP, Player *oP) {
 
 void Move::jump(int idx) {
 	// Clear jumped bits
-	mPieces &= ~(1 << idx);
-	mKings &= ~(1 << idx);
+	oPieces &= ~(1 << idx);
+	oKings &= ~(1 << idx);
 }
 
 void display_board(Player *p1, Player *p2) {
@@ -179,7 +179,7 @@ void possible_jumps(Player *mP, Player *oP, vector<vector<Move*>* > *moveList) {
 		oddrow = (((i - (i % 4))/4) % 2);
 		posInRow = i % 4;
 
-		// Non-jump moves
+		// Check for jumps
 		if (mP->checkWhite(i)) {
 			if (posInRow < 3 && !oddrow && oP->check(i+5) && !oP->check(i+9) && !mP->check(i+9) && i < 24) {
 				auto newMove = new Move(i,i+9,mP,oP);
