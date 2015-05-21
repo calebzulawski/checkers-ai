@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-std=c++11 -c -Wall
 LDFLAGS=
-SOURCES=board.cpp main.cpp
+SOURCES=ai.cpp board.cpp main.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=checkers-ai
 

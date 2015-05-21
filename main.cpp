@@ -1,4 +1,5 @@
 #include "board.hpp"
+#include "ai.hpp"
 #include <iostream>
 #include <vector>
 #include <time.h>
