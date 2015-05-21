@@ -39,5 +39,6 @@ int alphabeta(Player *mP, Player *oP, Move *move, int depth, int alpha, int beta
 		if (beta <= alpha)
 			break;
 	}
+	delete moveList;
 	return v;
 }
