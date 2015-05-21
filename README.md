@@ -6,7 +6,7 @@ This requires GCC 4.7 or later with C++11.  Other C++11 compatible compilers may
 
 To build and run:
 ```bash
-cd /directory/to/checkers-ai
+cd /path/to/checkers-ai
 make
 ./checkers-ai
 ```

@@ -66,38 +66,57 @@ void Move::jump(int idx) {
 }
 
 void display_board(Player *p1, Player *p2) {
-	string p1Color = p1->white ? "\x1b[37m" : "\x1b[30m";
-	string p2Color = p2->white ? "\x1b[37m" : "\x1b[30m";
+	string p1Color = p1->white ? "\x1b[47m" : "\x1b[40m";
+	string p2Color = p2->white ? "\x1b[47m" : "\x1b[40m";
+	string p1TextColor = p1->white ? "\x1b[30m" : "\x1b[37m";
+	string p2TextColor = p1->white ? "\x1b[30m" : "\x1b[37m";
 	string backgroundColor;
 	bool oddrow;
-	for (int i = 0; i < 32; i++) {
-		oddrow = (((i - (i % 4))/4) % 2);
-		if (!oddrow) {
-			cout << "\x1b[43m" << " ";
+	for (int i1 = 0; i1 < 8; i1++) {
+		for (int j = 0; j < 3; j++) {
+			for (int i2 = 0; i2 < 4; i2++) {
+				int i = i1*4 + i2;
+				oddrow = (((i - (i % 4))/4) % 2);
+				if (!oddrow) {
+					cout << "\x1b[43m" << "      ";
+				}
+				cout << "\x1b[41m";
+				if (j == 0) {
+					if (i < 10) {
+						cout << i << "     ";
+					} else {
+						cout << i << "    ";
+					}
+				}
+				else if (j == 1) {
+					if (p1->kings & (1 << i)) {
+						cout << "  " << p1Color << p1TextColor << "K♔" << "\x1b[41m" << "  ";
+					}
+					else if CHECK(p2->kings, i) {
+						cout << "  " << p2Color << p2TextColor << "K♔" << "\x1b[41m" << "  ";
+					}
+					else if CHECK(p1->pieces, i) {
+						cout << "  " << p1Color << p1TextColor << "  " << "\x1b[41m" << "  ";
+					}
+					else if CHECK(p2->pieces, i) {
+						cout << "  " << p2Color << p2TextColor << "  " << "\x1b[41m" << "  ";
+					}
+					else {
+						cout << "      ";
+					}
+				}
+				else if (j == 2) {
+					cout << "      ";
+				}
+				if (oddrow) {
+					cout << "\x1b[43m" << "      ";
+				}
+				if (!((i+1) % 4))
+					cout << "\x1b[0m" << endl;
+			}
 		}
-		cout << "\x1b[41m";
-		if (p1->kings & (1 << i)) {
-			cout << p1Color << "@";
-		}
-		else if CHECK(p2->kings, i) {
-			cout << p2Color << "@";
-		}
-		else if CHECK(p1->pieces, i) {
-			cout << p1Color << "O";
-		}
-		else if CHECK(p2->pieces, i) {
-			cout << p2Color << "O";
-		}
-		else {
-			cout << " ";
-		}
-		if (oddrow) {
-			cout << "\x1b[43m" << " ";
-		}
-		if (!((i+1) % 4))
-			cout << "\x1b[0m" << endl;
+		//cout << endl;
 	}
-	cout << endl;
 }
 
 void possible_moves(Player *mPin, Player *oPin, vector<vector<Move*>* > *moveList, Move *currentMove) {
