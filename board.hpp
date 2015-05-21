@@ -33,8 +33,10 @@ public:
 
 void display_board(Player *p1, Player *p2);
 
-void possible_moves(Player *mP, Player *oP, vector<vector<Move*>* > *moveList);
+void possible_moves(Player *mP, Player *oP, vector<vector<Move*>* > *moveList, Move *currentMove);
 
-bool possible_jumps(Player *mP, Player *oP, vector<vector<Move*>* > *moveList, vector<Move*> *currentMove);
+void possible_jumps(Player *mP, Player *oP, vector<vector<Move*>* > *moveList, vector<Move*> *currentMove);
+
+void movelist_gc(vector<vector<Move*>* > *moveList);
 
 #endif /* BOARD_H */
