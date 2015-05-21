@@ -24,7 +24,6 @@ class Move {
 public:
 	int startIdx;
 	int endIdx;
-	int jumpedIdx = -1;
 	uint32_t mPieces;
 	uint32_t mKings;
 	uint32_t oPieces;

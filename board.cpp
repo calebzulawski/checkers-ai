@@ -174,6 +174,8 @@ void possible_jumps(Player *mPin, Player *oPin, vector<vector<Move*>* > *moveLis
 	auto oP = new Player(oPin->white);
 	auto jumpVector = new vector<Move*>(0);
 	if (currentMove) {
+		cout << ( currentMove->back()->startIdx) << endl;
+		cout << ( currentMove->back()->endIdx) << endl;
 		mP->pieces = currentMove->back()->mPieces;
 		mP->kings = currentMove->back()->mKings;
 		oP->pieces = currentMove->back()->oPieces;
@@ -244,12 +246,18 @@ void possible_jumps(Player *mPin, Player *oPin, vector<vector<Move*>* > *moveLis
 	}
 
 	for(uint i=0; i < jumpVector->size(); i++) {
-		auto tempMoveVec = new vector<Move*>(currentMove->size());
-		for(uint j=0; j < tempMoveVec->size(); j++) {
-			(*tempMoveVec)[j] = (*currentMove)[j]; 
+		if (currentMove) {
+			auto tempMoveVec = new vector<Move*>(currentMove->size());
+			for(uint j=0; j < tempMoveVec->size(); j++) {
+				(*tempMoveVec)[j] = (*currentMove)[j]; 
+			}
+			tempMoveVec->push_back((*jumpVector)[i]);
+			possible_jumps(mP,oP,moveList,tempMoveVec);
+		} else {
+			auto tempMoveVec = new vector<Move*>(1,(*jumpVector)[i]);
+			possible_jumps(mP,oP,moveList,tempMoveVec);
 		}
-		tempMoveVec->push_back((*jumpVector)[i]);
-		possible_jumps(mP,oP,moveList,tempMoveVec);
+		
 	}
 
 	if (jumpVector->size() > 0 && currentMove) {
