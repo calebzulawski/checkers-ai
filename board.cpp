@@ -46,19 +46,23 @@ Move::Move(int sIdx, int eIdx, Player *mP, Player *oP) {
 	mKings = mP->kings;
 	oPieces = oP->pieces;
 	oKings = oP->kings;
-	if (abs(startIdx - endIdx) < 7) {
-		// Set new bits
-		mPieces |= 1 << endIdx;
-		// Check and set if king
-		mKings |= ((mKings >> startIdx) & 1) << endIdx;
-		// Clear old bits
-		mPieces &= ~(1 << startIdx);
-		mKings &= ~(1 << startIdx);
-	}
-	// Implement jumps
+
+	// Set new bits
+	mPieces |= 1 << endIdx;
+	// Check and set if king
+	mKings |= ((mKings >> startIdx) & 1) << endIdx;
+	// Clear old bits
+	mPieces &= ~(1 << startIdx);
+	mKings &= ~(1 << startIdx);
 
 	// King me
 	mKings |= (mP->white ? 0xF0000000 : 0x0000000F) & mPieces;
+}
+
+void Move::jump(int idx) {
+	// Clear jumped bits
+	mPieces &= ~(1 << idx);
+	mKings &= ~(1 << idx);
 }
 
 void display_board(Player *p1, Player *p2) {
@@ -113,12 +117,11 @@ void possible_moves(Player *mPin, Player *oPin, vector<vector<Move*>* > *moveLis
 
 	int oddrow;
 	int posInRow;
-	bool jumpFound = false;
 
 	movelist_gc(moveList);
-	//jumpFound = possible_jumps(mP, oP, moveList, NULL);
+	possible_jumps(mP, oP, moveList, NULL);
 
-	if (!jumpFound) {
+	if (moveList->size() == 0) {
 		for(int i=0; i < 32; i++) {
 			oddrow = (((i - (i % 4))/4) % 2);
 			posInRow = i % 4;
@@ -128,44 +131,36 @@ void possible_moves(Player *mPin, Player *oPin, vector<vector<Move*>* > *moveLis
 				if (posInRow < 3 && !oddrow && !oP->check(i+5) && !mP->check(i+5) && i < 28) {
 					auto newMove = new Move(i,i+5,mP,oP);
 					moveList->push_back(new vector<Move*>(1,newMove));
-					// i + 5
 				}
 				if (!oddrow && !mP->check(i+4) && !oP->check(i+4) && i < 28) {
 					auto newMove = new Move(i,i+4,mP,oP);
 					moveList->push_back(new vector<Move*>(1,newMove));
-					// i + 4
 				}
 				if (posInRow > 0 && oddrow && !oP->check(i+3) && !mP->check(i+3) && i < 28) {
 					auto newMove = new Move(i,i+3,mP,oP);
 					moveList->push_back(new vector<Move*>(1,newMove));
-					// i + 3
 				}
 				if (oddrow && !mP->check(i+4) && !oP->check(i+4) && i < 28) {
 					auto newMove = new Move(i,i+4,mP,oP);
 					moveList->push_back(new vector<Move*>(1,newMove));
-					// i + 4
 				}
 			}
 			if (mP->checkBlack(i)) {
 				if (posInRow < 3 && !oddrow && !oP->check(i-3) && !mP->check(i-3) && i > 3) {
 					auto newMove = new Move(i,i-3,mP,oP);
 					moveList->push_back(new vector<Move*>(1,newMove));
-					// i - 3
 				}
 				if (!oddrow && !mP->check(i-4) && !oP->check(i-4) && i > 3) {
 					auto newMove = new Move(i,i-4,mP,oP);
 					moveList->push_back(new vector<Move*>(1,newMove));
-					// i - 4
 				}
 				if (posInRow > 0 && oddrow && !oP->check(i-5) && !mP->check(i-5) && i > 3) {
 					auto newMove = new Move(i,i-5,mP,oP);
 					moveList->push_back(new vector<Move*>(1,newMove));
-					// i - 5
 				}
 				if (oddrow && !mP->check(i-4) && !oP->check(i-4) && i > 3) {
 					auto newMove = new Move(i,i-4,mP,oP);
 					moveList->push_back(new vector<Move*>(1,newMove));
-					// i - 4
 				}
 			}
 		}
@@ -201,36 +196,44 @@ void possible_jumps(Player *mPin, Player *oPin, vector<vector<Move*>* > *moveLis
 		if (mP->checkWhite(i)) {
 			if (posInRow < 3 && !oddrow && oP->check(i+5) && !oP->check(i+9) && !mP->check(i+9) && i < 24) {
 				auto newMove = new Move(i,i+9,mP,oP);
+				newMove->jump(i+5);
 				jumpVector->push_back(newMove);
 			}
 			if (posInRow > 0 && !oddrow && oP->check(i+4) && !mP->check(i+7) && !oP->check(i+7) && i < 24) {
 				auto newMove = new Move(i,i+7,mP,oP);
+				newMove->jump(i+4);
 				jumpVector->push_back(newMove);
 			}
 			if (posInRow < 3 && oddrow && oP->check(i+4) && !oP->check(i+9) && !mP->check(i+9) && i < 24) {
 				auto newMove = new Move(i,i+9,mP,oP);
+				newMove->jump(i+4);
 				jumpVector->push_back(newMove);
 			}
 			if (posInRow > 0 && oddrow && oP->check(i+3) && !mP->check(i+7) && !oP->check(i+7) && i < 24) {
 				auto newMove = new Move(i,i+7,mP,oP);
+				newMove->jump(i+3);
 				jumpVector->push_back(newMove);
 			}
 		}
 		if (mP->checkBlack(i)) {
 			if (posInRow < 3 && !oddrow && oP->check(i-3) && !oP->check(i-7) && !mP->check(i-7) && i > 7) {
 				auto newMove = new Move(i,i-7,mP,oP);
+				newMove->jump(i-3);
 				jumpVector->push_back(newMove);
 			}
 			if (posInRow > 0 && !oddrow && oP->check(i-4) && !mP->check(i-9) && !oP->check(i-9) && i > 7) {
 				auto newMove = new Move(i,i-9,mP,oP);
+				newMove->jump(i-4);
 				jumpVector->push_back(newMove);
 			}
 			if (posInRow < 3 && oddrow && oP->check(i-4) && !oP->check(i-7) && !mP->check(i-7) && i > 7) {
 				auto newMove = new Move(i,i-7,mP,oP);
+				newMove->jump(i-4);
 				jumpVector->push_back(newMove);
 			}
 			if (posInRow > 0 && oddrow && oP->check(i-5) && !mP->check(i-9) && !oP->check(i-9) && i > 7) {
 				auto newMove = new Move(i,i-9,mP,oP);
+				newMove->jump(i-5);
 				jumpVector->push_back(newMove);
 			}
 		}
@@ -238,6 +241,19 @@ void possible_jumps(Player *mPin, Player *oPin, vector<vector<Move*>* > *moveLis
 
 	if (jumpVector->size() == 0 && currentMove) {
 		moveList->push_back(currentMove);
+	}
+
+	for(uint i=0; i < jumpVector->size(); i++) {
+		auto tempMoveVec = new vector<Move*>(currentMove->size());
+		for(uint j=0; j < tempMoveVec->size(); j++) {
+			(*tempMoveVec)[j] = (*currentMove)[j]; 
+		}
+		tempMoveVec->push_back((*jumpVector)[i]);
+		possible_jumps(mP,oP,moveList,tempMoveVec);
+	}
+
+	if (jumpVector->size() > 0 && currentMove) {
+		delete currentMove;
 	}
 
 	delete mP;

@@ -24,11 +24,13 @@ class Move {
 public:
 	int startIdx;
 	int endIdx;
+	int jumpedIdx = -1;
 	uint32_t mPieces;
 	uint32_t mKings;
 	uint32_t oPieces;
 	uint32_t oKings;
-	Move(int startIdx, int endIdx, Player *mP, Player *oP);	
+	Move(int startIdx, int endIdx, Player *mP, Player *oP);
+	void jump(int idx);
 };
 
 void display_board(Player *p1, Player *p2);

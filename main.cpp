@@ -26,18 +26,20 @@ int main(int argc, char *argv[]) {
 		wP = opp;
 		bP = ai;
 	}
+	display_board(ai,opp);
 	while(true) {
 		mP = turn ? wP : bP;
 		oP = turn ? bP : wP;
 
 		moveList->clear();
 		possible_moves(mP,oP,moveList,NULL);
+
 		if (moveList->size() > 0) {
 			move = rand() % moveList->size();
-			mP->pieces = (*moveList)[move]->front()->mPieces;
-			mP->kings = (*moveList)[move]->front()->mKings;
-			oP->pieces = (*moveList)[move]->front()->oPieces;
-			oP->kings = (*moveList)[move]->front()->oKings;
+			mP->pieces = (*moveList)[move]->back()->mPieces;
+			mP->kings = (*moveList)[move]->back()->mKings;
+			oP->pieces = (*moveList)[move]->back()->oPieces;
+			oP->kings = (*moveList)[move]->back()->oKings;
 			cout << (turn ? "White move" : "Black move") << endl;
 			display_board(ai,opp);
 		} else {
