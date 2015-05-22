@@ -51,11 +51,11 @@ int alphabeta(Player *mP, Player *oP, Move *move, int depth, int alpha, int beta
 	return v;
 }
 
-void iterative_deepening(Player *mP, Player *oP, vector<Move*> **bestMove, mutex *bestMove_mutex, bool keepAlive) {
+void iterative_deepening(Player *mP, Player *oP, vector<Move*> **bestMove, mutex *bestMove_mutex, bool *keepAlive) {
 	// Max step and return best move
 	int depth = 0;
 	int besti = -1;
-	while(keepAlive) {
+	while(*keepAlive) {
 		int alpha = numeric_limits<int>::min();
 		int beta = numeric_limits<int>::max();
 
