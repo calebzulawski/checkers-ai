@@ -48,19 +48,14 @@ Move* PlayerWrapper::get_move(Player *opponent) {
 			}
 		}
 	} else {
-		vector<Move*> **bestMove;
+		auto bestMove = new vector<Move*>(0);
 		auto bestMove_mutex = new mutex;
 		auto keepAlive = new bool(true);
 		thread search (iterative_deepening, player, opponent, bestMove, bestMove_mutex, keepAlive);
 		this_thread::sleep_for(std::chrono::seconds(1));
 		*keepAlive = false;
-		search.join();
-		return (*bestMove)->back();
-		// auto moveList = new vector<vector<Move*>* >(0);
-		// possible_moves(player,opponent,moveList,NULL);
-		// if (moveList->size() == 0)
-		// 	return NULL;
-		// return (*moveList)[rand() % moveList->size()]->back();
+		search.detach();
+		return bestMove->back();
 	}
 }
 

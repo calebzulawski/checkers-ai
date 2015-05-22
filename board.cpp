@@ -89,7 +89,7 @@ void display_board(Player *p1, Player *p2) {
 					}
 				}
 				else if (j == 1) {
-					if (p1->kings & (1 << i)) {
+					if (CHECK(p1->kings, i)) {
 						cout << "  " << p1Color << p1TextColor << "K♔" << "\x1b[41m" << "  ";
 					}
 					else if CHECK(p2->kings, i) {
