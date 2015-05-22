@@ -1,6 +1,7 @@
 #include "ai.hpp"
 #include "board.hpp"
 #include <limits>
+#include <mutex>
 
 int rate_move(Move *move) {
 	int mPieces = (double) __builtin_popcountl(move->mPieces);
@@ -24,6 +25,13 @@ int alphabeta(Player *mP, Player *oP, Move *move, int depth, int alpha, int beta
 	if(maximize) {
 		possible_moves(mP, oP, moveList, move);	
 	} else {
+		uint32_t tempPieces, tempKings;
+		tempPieces = move->mPieces;
+		tempKings = move->mKings;
+		move->mPieces = move->oPieces;
+		move->mKings = move->oKings;
+		move->oPieces = tempPieces;
+		move->oKings = tempKings;
 		possible_moves(oP, mP, moveList, move);
 	}
 	
@@ -41,4 +49,34 @@ int alphabeta(Player *mP, Player *oP, Move *move, int depth, int alpha, int beta
 	}
 	delete moveList;
 	return v;
+}
+
+void iterative_deepening(Player *mP, Player *oP, vector<Move*> **bestMove, mutex *bestMove_mutex, bool keepAlive) {
+	// Max step and return best move
+	int depth = 0;
+	int besti = -1;
+	while(keepAlive) {
+		int alpha = numeric_limits<int>::min();
+		int beta = numeric_limits<int>::max();
+
+		int v = numeric_limits<int>::min();
+
+		auto moveList = new vector<vector<Move*>* >(0);
+		possible_moves(mP,oP,moveList,NULL);
+
+		for(uint i=0; i < moveList->size(); i++) {
+			int v2 = alphabeta(mP, oP, (*moveList)[i]->back(), depth, alpha, beta, false);
+			if (v2 > v)
+				besti = i;
+			v = max(v, v2);
+			alpha = max(alpha, v);
+			if (beta <= alpha)
+				break;
+		}
+		bestMove_mutex->lock();
+		*bestMove = (*moveList)[besti];
+		bestMove_mutex->unlock();
+		delete moveList;
+		depth++;
+	}
 }

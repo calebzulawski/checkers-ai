@@ -46,11 +46,11 @@ Move* PlayerWrapper::get_move(Player *opponent) {
 			}
 		}
 	} else {
-		auto moveList = new vector<vector<Move*>* >(0);
-		possible_moves(player,opponent,moveList,NULL);
-		if (moveList->size() == 0)
-			return NULL;
-		return (*moveList)[rand() % moveList->size()]->back();
+		// auto moveList = new vector<vector<Move*>* >(0);
+		// possible_moves(player,opponent,moveList,NULL);
+		// if (moveList->size() == 0)
+		// 	return NULL;
+		// return (*moveList)[rand() % moveList->size()]->back();
 	}
 }
 
