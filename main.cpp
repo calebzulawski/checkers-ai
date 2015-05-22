@@ -12,6 +12,6 @@ int main(int argc, char *argv[]) {
 	srand(time(NULL));
 	bool color = rand() % 2;
 	
-	auto game = new GameWrapper(color, !color);
+	auto game = new GameWrapper(true, true);
 	game->run();
 }

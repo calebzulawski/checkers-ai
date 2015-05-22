@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include "board.hpp"
 #include "ai.hpp"
 #include "wrappers.hpp"
@@ -9,52 +10,38 @@ Move* PlayerWrapper::get_move(Player *opponent) {
 		while(true) {
 			auto moveList = new vector<vector<Move*>* >(0);
 			possible_moves(player,opponent,moveList,NULL);
+			for (uint i=0; i < moveList->size(); i++) {
+				for (uint j=0; j < (*moveList)[i]->size(); j++) {
+					if (j == 0) {
+						cout << (*moveList)[i]->front()->startIdx;
+					}
+					cout << " --> " << (*(*moveList)[i])[j]->endIdx;
+				}
+				cout << endl;
+			}
 			
 			if (moveList->size() == 0)
 				return NULL;
-			
-			int startIdx;
-			int endIdx;
-			cout << "Select piece: ";
-			cin >> startIdx;
-			cout << "Move to: ";
-			cin >> endIdx;
 
-			bool multijump = false;
-			// Check if valid move
-			for(uint i=0; i < moveList->size(); i++) {
-				if ((*moveList)[i]->front()->startIdx == startIdx && (*moveList)[i]->front()->endIdx) {
-					if ((*moveList)[i]->size() == 1) {
-						// Works but memory leak
-						return (*moveList)[i]->front();
-					} else {
-						multijump = true;
+			// Read input command
+			cout << "Enter move: ";
+			string s;
+			getline(cin,s);
+			stringstream ss(s);
+			int temp;
+			vector<int> command(0);
+			while(ss >> temp)
+				command.push_back(temp);
+
+			for (uint i=0; i < moveList->size(); i++) {
+				if ((command.size() - 1) == (*moveList)[i]->size() && command.front() == (*moveList)[i]->front()->startIdx) {
+					bool good = true;
+					for (uint j=1; j < command.size(); j++) {
+						if (command[j] != (*(*moveList)[i])[j-1]->endIdx)
+							good = false;
 					}
-				}
-			}
-			int jumps [32];
-			uint idx = 0;
-			while(multijump) {
-				cout << "Continue jump to: ";
-				cin >> jumps[idx];
-				multijump = false;
-				for(uint i=0; i < moveList->size(); i++) {
-					if ((*moveList)[i]->front()->startIdx == startIdx && (*moveList)[i]->front()->endIdx && (*moveList)[i]->size() >= (idx + 1)) {
-						bool correct = true;
-						for(uint j=1; j < (*moveList)[i]->size(); j++) {
-							if ((*(*moveList)[i])[j]->endIdx != jumps[j-1]) {
-								correct = false;
-							}
-						}
-						if (correct) {
-							// Works but memory leak
-							if ((*moveList)[i]->size() == (idx + 1)) {
-								return (*moveList)[i]->back();
-							} else {
-								multijump = true;
-							}
-						}
-					}
+					if (good == true)
+						return (*moveList)[i]->back();
 				}
 			}
 		}
