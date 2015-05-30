@@ -69,7 +69,7 @@ void display_board(Player *p1, Player *p2) {
 	string p1Color = p1->white ? "\x1b[47m" : "\x1b[40m";
 	string p2Color = p2->white ? "\x1b[47m" : "\x1b[40m";
 	string p1TextColor = p1->white ? "\x1b[30m" : "\x1b[37m";
-	string p2TextColor = p1->white ? "\x1b[30m" : "\x1b[37m";
+	string p2TextColor = p2->white ? "\x1b[30m" : "\x1b[37m";
 	string backgroundColor;
 	bool oddrow;
 	for (int i1 = 0; i1 < 8; i1++) {

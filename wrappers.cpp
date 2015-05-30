@@ -52,7 +52,7 @@ Move* PlayerWrapper::get_move(Player *opponent) {
 		auto bestMove_mutex = new mutex;
 		auto keepAlive = new bool(true);
 		thread search (iterative_deepening, player, opponent, bestMove, bestMove_mutex, keepAlive);
-		this_thread::sleep_for(std::chrono::seconds(1));
+		this_thread::sleep_for(std::chrono::seconds(5));
 		*keepAlive = false;
 		search.detach();
 		return bestMove->back();

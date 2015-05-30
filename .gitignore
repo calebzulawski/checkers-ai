@@ -1,2 +1,6 @@
+# Executables
 checkers-ai
+checkers-ai.exe
+
+# Object files
 *.o
