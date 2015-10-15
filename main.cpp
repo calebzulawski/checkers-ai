@@ -1,10 +1,4 @@
-#include "board.hpp"
-#include "ai.hpp"
-#include "wrappers.hpp"
-#include <iostream>
-#include <vector>
-#include <time.h>
-#include <stdlib.h>
+#include "game.h"
 
 using namespace std;
 
