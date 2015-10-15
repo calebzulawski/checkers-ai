@@ -105,16 +105,16 @@ std::vector<Move*>* Board::jumps_from_square(Player turn, size_t i) {
 		}
 	}
 	if ( i > 7 && (black_piece(i) || white_king(i)) ) {
-		if (posInRow < 3 && !oddrow && oP->check(i-3) && no_piece(i-7)) {
+		if (posInRow < 3 && !oddrow && opponent_piece(i-3) && no_piece(i-7)) {
 			jumpVector->push_back(new Move(turn, i, i-3, i-7));
 		}
-		if (posInRow > 0 && !oddrow && oP->check(i-4) && no_piece(i-9)) {
+		if (posInRow > 0 && !oddrow && opponent_piece(i-4) && no_piece(i-9)) {
 			jumpVector->push_back(new Move(turn, i, i-4, i-9));
 		}
-		if (posInRow < 3 && oddrow && oP->check(i-4) && no_piece(i-7)) {
+		if (posInRow < 3 && oddrow && opponent_piece(i-4) && no_piece(i-7)) {
 			jumpVector->push_back(new Move(turn, i, i-4, i-7));
 		}
-		if (posInRow > 0 && oddrow && oP->check(i-5) && no_piece(i-9)) {
+		if (posInRow > 0 && oddrow && opponent_piece(i-5) && no_piece(i-9)) {
 			jumpVector->push_back(new Move(turn, i, i-5, i-9));
 		}
 	}
