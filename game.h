@@ -6,8 +6,15 @@
 
 class Move {
 public:
-    Board* board;
-    size_t start, end;
+    Move();
+    Move(Move m, size_t start, size_t end);
+    Move(Move m, size_t start, size_t jumped, size_t end);
+    ~Move();
+    Player  turn;
+    Board*  board;
+    size_t  start, end;
+    bool    jump;
+    std::vector<Move> children;
 };
 
 class Board {

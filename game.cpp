@@ -86,51 +86,94 @@ bool Board::black_king(Player p, size_t i) {
 	return (black_kings->test(i)  && turn == BLACK);
 }
 
-std::vector<Move*>* Board::jumps_from_square(Player turn, size_t i) {
-	auto jumpVector = new std::vector<Move*>();
+void Board::jumps_from_square(Player turn, size_t i, Move &m) {
 	oddrow = (((i - (i % 4))/4) % 2);
 	posInRow = i % 4;
 	if ( i < 24 && (white_piece(i) || black_king(i)) ) {
 		if (posInRow < 3 && !oddrow && opponent_piece(i+5) && no_piece(i+9)) {
-			jumpVector->push_back(new Move(turn, i, i+5, i+9));
+			m.children.push_back(std::move(Move(m, i, i+5, i+9)));
 		}
 		if (posInRow > 0 && !oddrow && opponent_piece(i+4) && no_piece(i+7)) {
-			jumpVector->push_back(new Move(turn, i, i+4, i+7));
+			m.children.push_back(std::move(Move(m, i, i+4, i+7)));
 		}
 		if (posInRow < 3 && oddrow && opponent_piece(i+4) && no_piece(i+9)) {
-			jumpVector->push_back(new Move(turn, i, i+4, i+9));
+			m.children.push_back(std::move(Move(m, i, i+4, i+9)));
 		}
 		if (posInRow > 0 && oddrow && opponent_piece(i+3) && no_piece(i+7)) {
-			jumpVector->push_back(new Move(turn, i, i+3, i+7));
+			m.children.push_back(std::move(Move(m, i, i+3, i+7)));
 		}
 	}
 	if ( i > 7 && (black_piece(i) || white_king(i)) ) {
 		if (posInRow < 3 && !oddrow && opponent_piece(i-3) && no_piece(i-7)) {
-			jumpVector->push_back(new Move(turn, i, i-3, i-7));
+			m.children.push_back(std::move(Move(m, i, i-3, i-7)));
 		}
 		if (posInRow > 0 && !oddrow && opponent_piece(i-4) && no_piece(i-9)) {
-			jumpVector->push_back(new Move(turn, i, i-4, i-9));
+			m.children.push_back(std::move(Move(m, i, i-4, i-9)));
 		}
 		if (posInRow < 3 && oddrow && opponent_piece(i-4) && no_piece(i-7)) {
-			jumpVector->push_back(new Move(turn, i, i-4, i-7));
+			m.children.push_back(std::move(Move(m, i, i-4, i-7)));
 		}
 		if (posInRow > 0 && oddrow && opponent_piece(i-5) && no_piece(i-9)) {
-			jumpVector->push_back(new Move(turn, i, i-5, i-9));
+			m.children.push_back(std::move(Move(m, i, i-5, i-9)));
 		}
 	}
-	return jumpVector;
+	return;
 }
 
-std::vector<std::vector<Move*>*> Board::possible_moves(Player turn) {
+Move Board::possible_moves(Player turn) {
 	bool jumpFound = false;
 	bool oddrow;
 	size_t posInRow;
 
-	auto jumps = std::vector<Move*>*();
+	auto jumps = new std::vector<std::vector<Move>>(0);
 
 	for (size_t i = 0; i < 32; i++) {
 		auto j = jumps_from_square(Player turn)
-		jumps.insert(jumps.end(), j.begin(), j.end());
+		jumps.insert(jumps.end(), j.begin(), j.end()); // Append to jumps
 		delete j;
 	}
+
+	// Process multiple jumps
+}
+
+void Board::apply_move(Player turn, size_t start, size_t end) {
+	if (turn == WHITE) {
+		white_pieces->reset(start);
+		white_pieces->set(end);
+		if (white_kings->test(start)) {
+			white_kings->reset(start)
+			white_kings->set(end);
+		}
+	} else {
+		black_pieces->reset(start);
+		black_pieces->set(end);
+		if (black_kings->test(start)) {
+			black_kings->reset(start)
+			black_kings->set(end);
+		}
+	}
+
+}
+
+void Board::apply_move(Player turn, size_t start, size_t jumped, size_t end) {
+	apply_move(turn, start, end);
+	if (turn == WHITE) {
+		black_pieces->reset(jumped);
+		black_kings->reset(jumped);
+	} else {
+		white_pieces->reset(jumped);
+		white_kings->reset(jumped);
+	}
+}
+
+Move::Move() :
+	board(new Board())
+{}
+
+Move::Move(Move m, size_t start_, size_t end_) :
+	board(new Board(m.board)),
+	start(start_),
+	end(end_),
+	turn(m.turn)
+{
 }
