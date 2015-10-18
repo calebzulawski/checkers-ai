@@ -10,14 +10,18 @@ void Game::run() {
 	Player turn = WHITE;
 	size_t turnCount;
 	for (turnCount = 1;; turnCount++) {
+		std::cout << clear_scr;
+		board->display();
+
 		std::vector<Move> moves;
 		board->possible_moves(turn, moves);
+		if (moves.size() == 0)
+			break;
 
 		if (isAI(turn)) {
 
 		} else {
-			std::cout << clear_scr;
-			board->display();
+
 			std::cout << (turn == WHITE ? "(WHITE)" : "(BLACK)") << "Enter move: ";
 
 			std::vector<size_t> input;
@@ -56,6 +60,8 @@ void Game::run() {
 		turnCount++;
 		turn = turn == WHITE ? BLACK : WHITE;
 	}
+
+	std::cout << (turn == WHITE ? "BLACK" : "WHITE") << " wins!" << std::endl << "Game completed in " << turnCount << " turns." << std::endl;
 }
 
 void Game::get_command(std::vector<size_t> &command) {

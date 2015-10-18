@@ -5,6 +5,8 @@
 
 enum Player {WHITE, BLACK};
 
+constexpr Player other_player(Player p) { return p == WHITE ? BLACK : WHITE; };
+
 const std::string white_bg = "\x1b[47m";
 const std::string black_bg = "\x1b[40m";
 const std::string white_text  = "\x1b[30m";
