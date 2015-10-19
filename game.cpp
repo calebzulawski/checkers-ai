@@ -19,7 +19,8 @@ void Game::run() {
 			break;
 
 		if (isAI(turn)) {
-
+			Move move = board->alpha_beta_start(5, turn, moves);
+			*board = *move.board;
 		} else {
 
 			std::cout << (turn == WHITE ? "(WHITE)" : "(BLACK)") << "Enter move: ";
@@ -49,12 +50,10 @@ void Game::run() {
 					m = n;
 				}
 
-				if (m) {
-					delete board;
-					board = new Board(*m->board);
-				} else {
+				if (m)
+					*board = *m->board;
+				else
 					std::cout << (turn == WHITE ? "(WHITE)" : "(BLACK)") << "Enter a valid move: ";
-				}
 			} while (m == nullptr);
 		}
 		turnCount++;

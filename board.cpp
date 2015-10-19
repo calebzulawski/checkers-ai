@@ -180,10 +180,7 @@ void Board::apply_move(Player turn, size_t start, size_t jumped, size_t end) {
 /* ------------ */
 /* AI FUNCTIONS */
 /* ------------ */
-Move Board::alpha_beta_start(size_t depth, Player maximize) {
-	std::vector<Move> moves;
-	possible_moves(maximize, moves);
-
+Move Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> moves) {
 	float v = std::numeric_limits<float>::lowest();
 	float alpha = std::numeric_limits<float>::lowest();
 	float beta = std::numeric_limits<float>::max();

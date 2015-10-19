@@ -55,7 +55,7 @@ public:
     void apply_move(Player turn, size_t start, size_t jumped, size_t end);
 
     // AI
-    Move  alpha_beta_start(size_t depth, Player maximize);
+    Move  alpha_beta_start(size_t depth, Player maximize, std::vector<Move> moves);
     float alpha_beta(size_t depth, float alpha, float beta, Player maximize, Player current);
     float score(Player p);
 

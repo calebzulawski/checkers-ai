@@ -6,6 +6,6 @@ int main(int argc, char *argv[]) {
 	srand(time(NULL));
 	//bool color = rand() % 2;
 	
-	Game game(false, false);
+	Game game(true, true);
 	game.run();
 }
