@@ -54,6 +54,11 @@ public:
     void apply_move(Player turn, size_t start, size_t end);
     void apply_move(Player turn, size_t start, size_t jumped, size_t end);
 
+    // AI
+    Move  alpha_beta_start(size_t depth, Player maximize);
+    float alpha_beta(size_t depth, float alpha, float beta, Player maximize, Player current);
+    float score(Player p);
+
 private:
     std::bitset<32> *white_pieces,
                     *black_pieces,

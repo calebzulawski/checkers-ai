@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <limits>
 
 #include "board.h"
 #include "move.h"
@@ -173,5 +174,67 @@ void Board::apply_move(Player turn, size_t start, size_t jumped, size_t end) {
 	} else {
 		white_pieces->reset(jumped);
 		white_kings->reset(jumped);
+	}
+}
+
+/* ------------ */
+/* AI FUNCTIONS */
+/* ------------ */
+Move Board::alpha_beta_start(size_t depth, Player maximize) {
+	std::vector<Move> moves;
+	possible_moves(maximize, moves);
+
+	float v = std::numeric_limits<float>::lowest();
+	float alpha = std::numeric_limits<float>::lowest();
+	float beta = std::numeric_limits<float>::max();
+	Move bestMove;
+	for (auto move : moves) {
+		float v_new = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(maximize));
+		if (v_new > v) {
+			v = v_new;
+			bestMove = move;
+		}
+		alpha = std::max(alpha, v);
+		if (beta <= alpha)
+			break;
+	}
+	return bestMove;
+}
+
+float Board::alpha_beta(size_t depth, float alpha, float beta, Player maximize, Player current) {
+	if (depth == 0)
+		return score(maximize);
+	
+	std::vector<Move> moves;
+	possible_moves(current, moves);
+
+	if (current == maximize) {
+		float v = std::numeric_limits<float>::lowest();
+		for (auto move : moves) {
+			float v_new = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current));
+			v = std::max(v, v_new);
+			alpha = std::max(alpha, v);
+			if (beta <= alpha)
+				break;
+		}
+		return v;
+	} else {
+		float v = std::numeric_limits<float>::max();
+		for (auto move : moves) {
+			float v_new = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current));
+			v = std::min(v, v_new) ;
+			beta = std::min(beta, v);
+			if (beta <= alpha)
+				break;
+		}
+		return v;
+	}
+}
+
+float Board::score(Player p) {
+	if (p == WHITE) {
+		return 3*white_kings->count() + white_pieces->count() - 3*black_kings->count() - black_pieces->count();
+	} else {
+		return 3*black_kings->count() + black_pieces->count() - 3*white_kings->count() - white_pieces->count();
 	}
 }
