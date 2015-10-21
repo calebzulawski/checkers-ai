@@ -2,7 +2,7 @@
 #include "board.h"
 
 Move::Move() :
-	board(new Board())
+	board(nullptr)
 {}
 
 Move::~Move() {

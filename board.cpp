@@ -198,6 +198,8 @@ void Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> mo
 		if (beta <= alpha)
 			break;
 	}
+	if (bestMove.board == nullptr)
+		return;
 }
 
 float Board::alpha_beta(size_t depth, float alpha, float beta, Player maximize, Player current) {
@@ -206,6 +208,9 @@ float Board::alpha_beta(size_t depth, float alpha, float beta, Player maximize, 
 	
 	std::vector<Move> moves;
 	possible_moves(current, moves);
+
+	if (moves.size() == 0)
+		return score(maximize);
 
 	if (current == maximize) {
 		float v = std::numeric_limits<float>::lowest();

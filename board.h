@@ -18,20 +18,20 @@ public:
         black_kings ( new std::bitset<32> (0) )
     {};
     Board(const Board& b) :
-        white_pieces( new std::bitset<32> (b.white_pieces->to_ulong()) ),
-        black_pieces( new std::bitset<32> (b.black_pieces->to_ulong()) ),
-        white_kings ( new std::bitset<32> (b.white_kings->to_ulong() ) ),
-        black_kings ( new std::bitset<32> (b.black_kings->to_ulong() ) )
+        white_pieces( new std::bitset<32> (*b.white_pieces) ),
+        black_pieces( new std::bitset<32> (*b.black_pieces) ),
+        white_kings ( new std::bitset<32> (*b.white_kings ) ),
+        black_kings ( new std::bitset<32> (*b.black_kings ) )
     {};
     Board& operator=(const Board& b) {
         delete white_pieces;
         delete black_pieces;
         delete white_kings;
         delete black_kings;
-        white_pieces = new std::bitset<32> (b.white_pieces->to_ulong());
-        black_pieces = new std::bitset<32> (b.black_pieces->to_ulong());
-        white_kings  = new std::bitset<32> (b.white_kings->to_ulong() );
-        black_kings  = new std::bitset<32> (b.black_kings->to_ulong() );
+        white_pieces = new std::bitset<32> (*b.white_pieces);
+        black_pieces = new std::bitset<32> (*b.black_pieces);
+        white_kings  = new std::bitset<32> (*b.white_kings );
+        black_kings  = new std::bitset<32> (*b.black_kings );
         return *this;
     }
     ~Board();

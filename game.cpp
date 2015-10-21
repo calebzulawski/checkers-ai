@@ -20,7 +20,10 @@ void Game::run() {
 
 		if (isAI(turn)) {
 			Move bestMove;
-			board->alpha_beta_start(10, turn, moves, bestMove);
+			if (moves.size() == 1)
+				bestMove = moves.front();
+			else
+				board->alpha_beta_start(10, turn, moves, bestMove);
 			*board = *bestMove.board;
 		} else {
 
@@ -50,6 +53,10 @@ void Game::run() {
 					}
 					m = n;
 				}
+
+				// find incomplete jump
+				if (m->children.size() != 0)
+					continue;
 
 				if (m)
 					*board = *m->board;
