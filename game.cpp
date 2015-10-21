@@ -19,8 +19,9 @@ void Game::run() {
 			break;
 
 		if (isAI(turn)) {
-			Move move = board->alpha_beta_start(5, turn, moves);
-			*board = *move.board;
+			Move bestMove;
+			board->alpha_beta_start(10, turn, moves, bestMove);
+			*board = *bestMove.board;
 		} else {
 
 			std::cout << (turn == WHITE ? "(WHITE)" : "(BLACK)") << "Enter move: ";

@@ -35,10 +35,10 @@ void Board::display() {
 				}
 				else if (j == 1) {
 					if (white_kings->test(i)) {
-						std::cout << "  " << white_bg << white_text << "K♔" << "\x1b[41m" << "  ";
+						std::cout << "  " << white_bg << white_text << "K " << "\x1b[41m" << "  ";
 					}
 					else if (black_kings->test(i)) {
-						std::cout << "  " << black_bg << black_text << "K♔" << "\x1b[41m" << "  ";
+						std::cout << "  " << black_bg << black_text << "K " << "\x1b[41m" << "  ";
 					}
 					else if (white_pieces->test(i)) {
 						std::cout << "  " << white_bg << white_text << "  " << "\x1b[41m" << "  ";
@@ -152,6 +152,8 @@ void Board::apply_move(Player turn, size_t start, size_t end) {
 	if (turn == WHITE) {
 		white_pieces->reset(start);
 		white_pieces->set(end);
+		if (end > 27)
+			white_kings->set(end);
 		if (white_kings->test(start)) {
 			white_kings->reset(start);
 			white_kings->set(end);
@@ -159,6 +161,8 @@ void Board::apply_move(Player turn, size_t start, size_t end) {
 	} else {
 		black_pieces->reset(start);
 		black_pieces->set(end);
+		if (end < 4)
+			black_kings->set(end);
 		if (black_kings->test(start)) {
 			black_kings->reset(start);
 			black_kings->set(end);
@@ -180,11 +184,10 @@ void Board::apply_move(Player turn, size_t start, size_t jumped, size_t end) {
 /* ------------ */
 /* AI FUNCTIONS */
 /* ------------ */
-Move Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> moves) {
+void Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> moves, Move &bestMove) {
 	float v = std::numeric_limits<float>::lowest();
 	float alpha = std::numeric_limits<float>::lowest();
 	float beta = std::numeric_limits<float>::max();
-	Move bestMove;
 	for (auto move : moves) {
 		float v_new = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(maximize));
 		if (v_new > v) {
@@ -195,7 +198,6 @@ Move Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> mo
 		if (beta <= alpha)
 			break;
 	}
-	return bestMove;
 }
 
 float Board::alpha_beta(size_t depth, float alpha, float beta, Player maximize, Player current) {
