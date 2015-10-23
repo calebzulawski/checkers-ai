@@ -29,11 +29,13 @@ public:
     Move(Player p, Board *b, size_t start, size_t end);
     Move(Player p, Board *b, size_t start, size_t jumped, size_t end);
     ~Move();
+
     Player  turn;
     Board*  board;
     size_t  start, end;
     bool    jump;
     std::vector<Move> children;
 };
+
 
 #endif /* MOVE_H */

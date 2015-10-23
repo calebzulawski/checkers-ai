@@ -1,6 +1,8 @@
 #include "move.h"
 #include "board.h"
 
+#include <map>
+
 Move::Move() :
 	board(nullptr)
 {}

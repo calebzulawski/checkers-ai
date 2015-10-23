@@ -16,16 +16,38 @@ Board::~Board() {
 }
 
 void Board::display() {
+	// Draw top border
+	std::cout << red_bg;
+	for (int i = 0; i < 56; i++)
+		std::cout << " ";
+	std::cout << reset_scr << std::endl;
+	std::cout << red_bg << "  ";
+	std::cout << white_bg;
+	for (int i = 0; i < 52; i++)
+		std::cout << " ";
+	std::cout << red_bg << "  " << reset_scr << std::endl;
+
 	bool oddrow;
 	for (int i1 = 0; i1 < 8; i1++) {
 		for (int j = 0; j < 3; j++) {
 			for (int i2 = 0; i2 < 4; i2++) {
 				int i = i1*4 + i2;
+
+				// Draw left border
+				if (i2 == 0) {
+					std::cout << red_bg << "  ";
+					if (i1 < 4)
+						std::cout << white_bg << "  ";
+					else
+						std::cout << black_bg << "  ";
+				}
+
+				// Draw board
 				oddrow = (((i - (i % 4))/4) % 2);
 				if (!oddrow) {
-					std::cout << "\x1b[43m" << "      ";
+					std::cout << yellow_bg << "      ";
 				}
-				std::cout << "\x1b[41m";
+				std::cout << red_bg;
 				if (j == 0) {
 					if (i < 10) {
 						std::cout << i << "     ";
@@ -35,16 +57,16 @@ void Board::display() {
 				}
 				else if (j == 1) {
 					if (white_kings->test(i)) {
-						std::cout << "  " << white_bg << white_text << "K " << "\x1b[41m" << "  ";
+						std::cout << "  " << white_bg << white_text << "K " << red_bg << "  ";
 					}
 					else if (black_kings->test(i)) {
-						std::cout << "  " << black_bg << black_text << "K " << "\x1b[41m" << "  ";
+						std::cout << "  " << black_bg << black_text << "K " << red_bg << "  ";
 					}
 					else if (white_pieces->test(i)) {
-						std::cout << "  " << white_bg << white_text << "  " << "\x1b[41m" << "  ";
+						std::cout << "  " << white_bg << white_text << "  " << red_bg << "  ";
 					}
 					else if (black_pieces->test(i)) {
-						std::cout << "  " << black_bg << black_text << "  " << "\x1b[41m" << "  ";
+						std::cout << "  " << black_bg << black_text << "  " << red_bg << "  ";
 					}
 					else {
 						std::cout << "      ";
@@ -54,13 +76,33 @@ void Board::display() {
 					std::cout << "      ";
 				}
 				if (oddrow) {
-					std::cout << "\x1b[43m" << "      ";
+					std::cout << yellow_bg << "      ";
 				}
+
+				// Draw right border
+				if (i2 == 3) {
+					if (i1 < 4)
+						std::cout << white_bg << "  ";
+					else
+						std::cout << black_bg << "  ";
+					std::cout << red_bg << "  ";
+				}
+
 				if (!((i+1) % 4))
-					std::cout << "\x1b[0m" << std::endl;
+					std::cout << reset_scr << std::endl;
 			}
 		}
 	}
+	// Draw bottom border
+	std::cout << red_bg << "  ";
+	std::cout << black_bg;
+	for (int i = 0; i < 52; i++)
+		std::cout << " ";
+	std::cout << red_bg << "  " << reset_scr << std::endl;
+	std::cout << red_bg;
+	for (int i = 0; i < 56; i++)
+		std::cout << " ";
+	std::cout << reset_scr << std::endl;
 }
 
 bool Board::no_piece(size_t i) {
@@ -236,9 +278,6 @@ float Board::alpha_beta(size_t depth, float alpha, float beta, Player maximize, 
 }
 
 float Board::score(Player p) {
-	if (p == WHITE) {
-		return 3*white_kings->count() + white_pieces->count() - 3*black_kings->count() - black_pieces->count();
-	} else {
-		return 3*black_kings->count() + black_pieces->count() - 3*white_kings->count() - white_pieces->count();
-	}
+	float metric = 3*white_kings->count() + white_pieces->count() - 3*black_kings->count() - black_pieces->count();
+	return p == WHITE ? metric : -metric;
 }
