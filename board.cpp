@@ -141,23 +141,23 @@ void Board::jumps_from_square(size_t i, Player p, std::vector<Move> &v) {
 	size_t posInRow = i % 4;
 	if ( i < 24 && (is_white_piece(p, i) || is_black_king(p, i)) ) {
 		if (posInRow < 3 && !oddrow && opponent_piece(p, i+5) && no_piece(i+9))
-			v.push_back(std::move(Move(p, this, i, i+5, i+9)));
+			v.push_back(Move(p, this, i, i+5, i+9));
 		if (posInRow > 0 && !oddrow && opponent_piece(p, i+4) && no_piece(i+7))
-			v.push_back(std::move(Move(p, this, i, i+4, i+7)));
+			v.push_back(Move(p, this, i, i+4, i+7));
 		if (posInRow < 3 && oddrow && opponent_piece(p, i+4) && no_piece(i+9))
-			v.push_back(std::move(Move(p, this, i, i+4, i+9)));
+			v.push_back(Move(p, this, i, i+4, i+9));
 		if (posInRow > 0 && oddrow && opponent_piece(p, i+3) && no_piece(i+7))
-			v.push_back(std::move(Move(p, this, i, i+3, i+7)));
+			v.push_back(Move(p, this, i, i+3, i+7));
 	}
 	if ( i > 7 && (is_black_piece(p, i) || is_white_king(p, i)) ) {
 		if (posInRow < 3 && !oddrow && opponent_piece(p, i-3) && no_piece(i-7))
-			v.push_back(std::move(Move(p, this, i, i-3, i-7)));
+			v.push_back(Move(p, this, i, i-3, i-7));
 		if (posInRow > 0 && !oddrow && opponent_piece(p, i-4) && no_piece(i-9))
-			v.push_back(std::move(Move(p, this, i, i-4, i-9)));
+			v.push_back(Move(p, this, i, i-4, i-9));
 		if (posInRow < 3 && oddrow && opponent_piece(p, i-4) && no_piece(i-7))
-			v.push_back(std::move(Move(p, this, i, i-4, i-7)));
+			v.push_back(Move(p, this, i, i-4, i-7));
 		if (posInRow > 0 && oddrow && opponent_piece(p, i-5) && no_piece(i-9))
-			v.push_back(std::move(Move(p, this, i, i-5, i-9)));
+			v.push_back(Move(p, this, i, i-5, i-9));
 	}
 	return;
 }
