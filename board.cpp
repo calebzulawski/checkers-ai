@@ -15,6 +15,13 @@ Board::~Board() {
 	delete black_kings;
 }
 
+void Board::clear() {
+	white_pieces->reset();
+	white_kings->reset();
+	black_pieces->reset();
+	black_kings->reset();
+}
+
 void Board::display() {
 	// Draw top border
 	std::cout << red_bg;

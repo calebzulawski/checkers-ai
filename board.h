@@ -37,6 +37,7 @@ public:
     ~Board();
 
     void display();
+    void clear();
 
     // Functions for determining various board states
     bool no_piece(size_t i);
@@ -59,12 +60,12 @@ public:
     float alpha_beta(size_t depth, float alpha, float beta, Player maximize, Player current);
     float score(Player p);
 
-private:
     std::bitset<32> *white_pieces,
                     *black_pieces,
                     *white_kings,
                     *black_kings;
 
+private:
 };
 
 #endif /* BOARD_H */

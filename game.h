@@ -14,15 +14,21 @@ public:
         board(new Board())
     {}
 
+    Game() :
+        board(new Board())
+    {}
+
+    void load(char *filename);
+    void prompt();
     void run();
     void get_command(std::vector<size_t> &command);
     bool isAI(Player turn) { return (turn == WHITE && whiteIsAi) || (turn == BLACK && blackIsAi); };
     bool find_move(std::vector<size_t> &input, std::vector<Move> &moves, size_t depth, Move &foundMove);
 
-private:
     bool   whiteIsAi,
            blackIsAi;
     Board *board;
+    Player turn = WHITE;
 
 };
 

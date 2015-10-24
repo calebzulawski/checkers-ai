@@ -16,7 +16,8 @@ public:
     	board(new Board(*m.board)),
     	start(m.start),
     	end  (m.end),
-    	jump (m.jump)
+    	jump (m.jump),
+        children(m.children)
     {};
     Move& operator=(const Move& m) {
     	turn  = m.turn;
@@ -24,6 +25,7 @@ public:
     	start = m.start;
     	end   = m.end;
     	jump  = m.jump;
+        children = m.children;
     	return *this;
     }
     Move(Player p, Board *b, size_t start, size_t end);

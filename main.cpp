@@ -1,11 +1,17 @@
 #include "game.h"
+#include "board.h"
+#include "constants.h"
+
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 
 int main(int argc, char *argv[]) {
-	srand(time(NULL));
-	//bool color = rand() % 2;
-	
-	Game game(true, false);
+	Game game;
+	if (argc == 2) {
+		game.load(argv[1]);
+	}
+	game.prompt();
 	game.run();
 }

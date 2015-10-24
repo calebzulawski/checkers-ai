@@ -3,11 +3,71 @@
 #include <vector>
 #include <sstream>
 #include <iostream>
+#include <fstream>
+#include <limits>
 
 #include "constants.h"
 
+void Game::prompt() {
+	std::cout << "Choose an option: " << std::endl;
+	std::cout << "\t(1)\tAI vs player, player plays white" << std::endl;
+	std::cout << "\t(2)\tAI vs Player, player plays black" << std::endl;
+	std::cout << "\t(3)\tAI vs AI" << std::endl;
+	int selection;
+	while(std::cin >> selection) {
+		if (selection == 1) {
+			whiteIsAi = false;
+			blackIsAi = true;
+			break;
+		} else if (selection == 2) {
+			whiteIsAi = true;
+			blackIsAi = false;
+			break;
+		} else if (selection == 3) {
+			whiteIsAi = true;
+			blackIsAi = true;
+			break;
+		}
+	}
+}
+
+void Game::load(char *filename) {
+	board->clear();
+	std::ifstream ifs(filename);
+	size_t val;
+	for (size_t i = 0; i < 32; i++) {
+		ifs >> val;
+		if (ifs.eof())
+			exit(-1);
+		if (val == 1) {
+			board->white_pieces->set(i);
+		}
+		else if (val == 2) {
+			board->black_pieces->set(i);
+		}
+		else if (val == 3) {
+			board->white_pieces->set(i);
+			board->white_kings->set(i);
+		}
+		else if (val == 4) {
+			board->black_pieces->set(i);
+			board->black_kings->set(i);
+		}
+	}
+	ifs >> val;
+	if (ifs.eof())
+		exit(-1);
+
+	if (val == 1)
+		turn = WHITE;
+	else
+		turn = BLACK;
+
+	ifs >> val;
+	//eventually set this to search time
+}
+
 void Game::run() {
-	Player turn = WHITE;
 	size_t turnCount;
 	for (turnCount = 1;; turnCount++) {
 		std::cout << clear_scr;
@@ -28,12 +88,11 @@ void Game::run() {
 			//printf("Enter to continue...");
 			//std::cin.get();
 		} else {
-
 			std::cout << (turn == WHITE ? "(WHITE)" : "(BLACK)") << "Enter move: ";
 
-			std::vector<size_t> input;
 			// Move *m, *n;
 			while(true) {
+				std::vector<size_t> input;
 				get_command(input);
 				if (std::cin.eof())
 					exit(0);
@@ -41,6 +100,7 @@ void Game::run() {
 				Move m;
 				if (find_move(input, moves, 0, m)) {
 					*board = *m.board;
+					break;
 				} else {
 					std::cout << (turn == WHITE ? "(WHITE)" : "(BLACK)") << "Enter a valid move: ";
 					continue;
@@ -80,6 +140,7 @@ void Game::run() {
 }
 
 void Game::get_command(std::vector<size_t> &command) {
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max());
 	std::string s;
 	getline(std::cin,s);
 	std::stringstream ss(s);
