@@ -258,6 +258,7 @@ float Board::alpha_beta(size_t depth, float alpha, float beta, Player maximize, 
 	std::vector<Move> moves;
 	possible_moves(current, moves);
 
+
 	if (moves.size() == 0)
 		return score(maximize);
 

@@ -108,6 +108,7 @@ void Game::run() {
 
 		std::vector<Move> moves;
 		board->possible_moves(turn, moves);
+		split_moves(moves, moves);
 		if (moves.size() == 0)
 			break;
 
