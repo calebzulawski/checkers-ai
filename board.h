@@ -6,6 +6,7 @@ class Move;
 
 #include <bitset>
 #include <vector>
+#include <vector>
 
 #include "constants.h"
 

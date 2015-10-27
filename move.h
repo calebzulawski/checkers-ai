@@ -4,6 +4,7 @@
 class Move;
 
 #include <vector>
+#include <vector>
 
 #include "board.h"
 #include "constants.h"
@@ -42,12 +43,13 @@ public:
     std::vector<size_t> path;
 };
 
-void split_moves(std::vector<Move>   &root,
-                 std::vector<Move>   &v,
-                 std::vector<size_t> *path  = nullptr,
-                 bool                 top   = true,
-                 size_t               start = 32,
-                 size_t               end   = 32);
+void split_moves(std::vector<Move> &root, std::vector<size_t> *path = nullptr);
+
+void split_moves_recur(std::vector<Move>    &root,
+                       std::vector<Move>   &v,
+                       std::vector<size_t> *path  = nullptr,      
+                       size_t               start = 32,
+                       size_t               end   = 32);
 
 
 #endif /* MOVE_H */

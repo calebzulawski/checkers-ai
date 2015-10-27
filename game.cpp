@@ -1,6 +1,7 @@
 #include "game.h"
 
 #include <vector>
+#include <vector>
 #include <sstream>
 #include <iostream>
 #include <fstream>
@@ -108,11 +109,12 @@ void Game::run() {
 
 		std::vector<Move> moves;
 		board->possible_moves(turn, moves);
-		split_moves(moves, moves);
+		
 		if (moves.size() == 0)
 			break;
 
 		if (isAI(turn)) {
+			split_moves(moves);
 			Move bestMove;
 			if (moves.size() == 1)
 				bestMove = moves.front();
@@ -122,6 +124,8 @@ void Game::run() {
 			printf("Press enter to continue...");
 			std::cin.get();
 		} else {
+			std::vector<size_t> path;
+			split_moves(moves, &path);
 			std::cout << (turn == WHITE ? "(WHITE)" : "(BLACK)") << "Enter move: ";
 
 			while(true) {
