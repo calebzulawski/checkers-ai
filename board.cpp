@@ -234,12 +234,12 @@ void Board::apply_move(Player turn, size_t start, size_t jumped, size_t end) {
 /* ------------ */
 /* AI FUNCTIONS */
 /* ------------ */
-void Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> moves, Move &bestMove) {
+void Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> moves, Move &bestMove, bool &trigger) {
 	float v = std::numeric_limits<float>::lowest();
 	float alpha = std::numeric_limits<float>::lowest();
 	float beta = std::numeric_limits<float>::max();
 	for (auto move : moves) {
-		float v_new = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(maximize));
+		float v_new = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(maximize), trigger);
 		if (v_new > v) {
 			v = v_new;
 			bestMove = move;
@@ -248,12 +248,11 @@ void Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> mo
 		if (beta <= alpha)
 			break;
 	}
-	if (bestMove.board == nullptr)
-		return;
+	trigger = true;
 }
 
-float Board::alpha_beta(size_t depth, float alpha, float beta, Player maximize, Player current) {
-	if (depth == 0)
+float Board::alpha_beta(size_t depth, float alpha, float beta, Player maximize, Player current, bool &trigger) {
+	if (depth == 0 || trigger)
 		return score(maximize);
 	
 	std::vector<Move> moves;
@@ -266,7 +265,7 @@ float Board::alpha_beta(size_t depth, float alpha, float beta, Player maximize, 
 	if (current == maximize) {
 		float v = std::numeric_limits<float>::lowest();
 		for (auto move : moves) {
-			float v_new = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current));
+			float v_new = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current), trigger);
 			v = std::max(v, v_new);
 			alpha = std::max(alpha, v);
 			if (beta <= alpha)
@@ -276,7 +275,7 @@ float Board::alpha_beta(size_t depth, float alpha, float beta, Player maximize, 
 	} else {
 		float v = std::numeric_limits<float>::max();
 		for (auto move : moves) {
-			float v_new = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current));
+			float v_new = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current), trigger);
 			v = std::min(v, v_new) ;
 			beta = std::min(beta, v);
 			if (beta <= alpha)
@@ -287,6 +286,12 @@ float Board::alpha_beta(size_t depth, float alpha, float beta, Player maximize, 
 }
 
 float Board::score(Player p) {
-	float metric = 3*white_kings->count() + white_pieces->count() - 3*black_kings->count() - black_pieces->count();
+	const float king_weight = 5;
+	const float norm_weight = 3;
+	float metric = king_weight * white_kings->count()
+	             + norm_weight * white_pieces->count()
+	             - king_weight * black_kings->count()
+	             - norm_weight * black_pieces->count()
+	             + (rand()%100)/1000.;
 	return p == WHITE ? metric : -metric;
 }

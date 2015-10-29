@@ -20,16 +20,18 @@ public:
 
     void load(char *filename);
     void prompt();
+    void list_moves(std::vector<Move> &v);
     void run();
-    void get_command(std::vector<size_t> &command);
     bool isAI(Player turn) { return (turn == WHITE && whiteIsAi) || (turn == BLACK && blackIsAi); };
-    bool find_move(std::vector<size_t> &input, std::vector<Move> &moves, size_t depth, Move &foundMove);
 
     bool   whiteIsAi,
            blackIsAi;
+    float  searchTime;
     Board *board;
     Player turn = WHITE;
 
 };
+
+void timer(bool *trigger, float time);
 
 #endif /* GAME_H */

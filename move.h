@@ -18,7 +18,8 @@ public:
     	start    (m.start),
     	end      (m.end),
     	jump     (m.jump),
-        children (m.children)
+        children (m.children),
+        path     (m.path)
     {};
     Move& operator=(const Move& m) {
         turn     = m.turn;
@@ -27,13 +28,14 @@ public:
         end      = m.end;
         jump     = m.jump;
         children = m.children;
+        path     = m.path;
         return *this;
     }
     Move(Player p, Board *b, size_t start, size_t end);
     Move(Player p, Board *b, size_t start, size_t jumped, size_t end);
     ~Move();
 
-    void split_moves(std::vector<Move> &v);
+    void display();
     
     Player  turn;
     Board*  board;
@@ -43,7 +45,7 @@ public:
     std::vector<size_t> path;
 };
 
-void split_moves(std::vector<Move> &root, std::vector<size_t> *path = nullptr);
+void split_moves(std::vector<Move> &root, bool tracePaths);
 
 void split_moves_recur(std::vector<Move>    &root,
                        std::vector<Move>   &v,

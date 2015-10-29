@@ -2,20 +2,24 @@
 
 #include <vector>
 #include <vector>
+#include <string>
 #include <sstream>
 #include <iostream>
 #include <fstream>
 #include <limits>
+#include <chrono>
+#include <thread>
 
 #include "constants.h"
 
 void Game::prompt() {
-	std::cout << "Choose an option: " << std::endl;
+	int selection;
+	std::string s;
+	std::cout << "Choose an option:" << std::endl;
 	std::cout << "\t(1)\tAI vs player, player plays white" << std::endl;
 	std::cout << "\t(2)\tAI vs Player, player plays black" << std::endl;
 	std::cout << "\t(3)\tAI vs AI" << std::endl;
-	int selection;
-	std::string s;
+	std::cout << "> ";
 	getline(std::cin, s);
 	std::stringstream ss(s);
 	while(ss >> selection) {
@@ -34,35 +38,18 @@ void Game::prompt() {
 			break;
 		}
 	}
-}
-
-void Game::get_command(std::vector<size_t> &command) {
-	std::string s;
+	std::cout << "Enter an AI search time limit:" << std::endl;
+	std::cout << "> ";
 	getline(std::cin, s);
-	std::stringstream ss(s);
-	int temp;
-	while(ss >> temp)
-		command.push_back(temp);
+	ss.str(s);
+	ss >> searchTime;
 }
 
-bool Game::find_move(std::vector<size_t> &input, std::vector<Move> &moves, size_t depth, Move &foundMove) {
-	if ( ((int)input.size() - 1) < (int)(depth + 1))
-		return false;
-	for (auto move : moves) {
-		if (move.start == input[depth] && move.end == input[depth+1]) {
-			if (move.children.size() == 0) {
-				if (input.size()-1 == depth+1) {
-					foundMove = move;
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				return find_move(input, move.children, depth+1, foundMove);
-			}
-		}
+void Game::list_moves(std::vector<Move> &v) {
+	for (size_t i = 0; i < v.size(); i++) {
+		std::cout << i << ")\t";
+		v[i].display();
 	}
-	return false;
 }
 
 void Game::load(char *filename) {
@@ -114,29 +101,36 @@ void Game::run() {
 			break;
 
 		if (isAI(turn)) {
-			split_moves(moves);
+			split_moves(moves, false);
 			Move bestMove;
-			if (moves.size() == 1)
+			if (moves.size() == 1) {
 				bestMove = moves.front();
-			else
-				board->alpha_beta_start(10, turn, moves, bestMove);
+			} else {
+				bool trigger;
+				std::thread timerThread(timer, &trigger, searchTime);
+				board->alpha_beta_start(10, turn, moves, bestMove, trigger);
+				timerThread.join();
+			}
 			*board = *bestMove.board;
 			printf("Press enter to continue...");
 			std::cin.get();
 		} else {
 			std::vector<size_t> path;
-			split_moves(moves, &path);
+			split_moves(moves, true);
+			list_moves(moves);
 			std::cout << (turn == WHITE ? "(WHITE)" : "(BLACK)") << "Enter move: ";
 
 			while(true) {
-				std::vector<size_t> input;
-				get_command(input);
+				std::string s;
+				getline(std::cin, s);
+				std::stringstream ss(s);
+				size_t index;
+				ss >> index;
 				if (std::cin.eof())
 					exit(0);
 
-				Move m;
-				if (find_move(input, moves, 0, m)) {
-					*board = *m.board;
+				if (index < moves.size()) {
+					*board = *moves[index].board;
 					break;
 				} else {
 					std::cout << (turn == WHITE ? "(WHITE)" : "(BLACK)") << "Enter a valid move: ";
@@ -149,4 +143,15 @@ void Game::run() {
 	}
 
 	std::cout << (turn == WHITE ? "BLACK" : "WHITE") << " wins!" << std::endl << "Game completed in " << turnCount << " turns." << std::endl;
+}
+
+void timer(bool *trigger, float searchTime) {
+	const float timeFraction = 0.95;
+	auto start_time = std::chrono::high_resolution_clock::now();
+	while(!*trigger) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		auto end_time = std::chrono::high_resolution_clock::now();
+		if (std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count() > (timeFraction*searchTime))
+			*trigger = true;
+	}
 }
