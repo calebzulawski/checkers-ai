@@ -104,21 +104,31 @@ void Game::run() {
 			split_moves(moves, false);
 			Move bestMove;
 			if (moves.size() == 1) {
+				std::cout << "Selecting only posible move." << std::endl;
 				bestMove = moves.front();
 			} else {
-				bool trigger;
+				bool trigger = false;
 				std::thread timerThread(timer, &trigger, searchTime);
-				board->alpha_beta_start(10, turn, moves, bestMove, trigger);
+				auto start_time = std::chrono::high_resolution_clock::now();
+				size_t depth = board->iterative_deepening(turn, moves, bestMove, trigger);
+				auto end_time = std::chrono::high_resolution_clock::now();
+				auto diff_time = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
 				timerThread.join();
+				if (depth == 0) {
+					std::cout << "Was not able to search the root depth in this time!" << std::endl;
+					bestMove = moves[rand() % moves.size()];
+				} else {
+					std::cout << "Searched to depth " << depth << " in " << diff_time << " seconds." << std::endl;
+				}
 			}
 			*board = *bestMove.board;
-			printf("Press enter to continue...");
+			std::cout << "Press enter to continue..." << std::endl;
 			std::cin.get();
 		} else {
 			std::vector<size_t> path;
 			split_moves(moves, true);
 			list_moves(moves);
-			std::cout << (turn == WHITE ? "(WHITE)" : "(BLACK)") << "Enter move: ";
+			std::cout << (turn == WHITE ? "(WHITE)" : "(BLACK)") << " Enter move: ";
 
 			while(true) {
 				std::string s;
@@ -133,7 +143,7 @@ void Game::run() {
 					*board = *moves[index].board;
 					break;
 				} else {
-					std::cout << (turn == WHITE ? "(WHITE)" : "(BLACK)") << "Enter a valid move: ";
+					std::cout << (turn == WHITE ? "(WHITE)" : "(BLACK)") << " Enter a valid move: ";
 					continue;
 				}
 			}

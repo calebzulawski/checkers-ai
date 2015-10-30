@@ -57,9 +57,10 @@ public:
     void apply_move(Player turn, size_t start, size_t jumped, size_t end);
 
     // AI
-    void  alpha_beta_start(size_t depth, Player maximize, std::vector<Move> moves, Move &bestMove, bool &trigger);
-    float alpha_beta(size_t depth, float alpha, float beta, Player maximize, Player current, bool &trigger);
-    float score(Player p);
+    size_t iterative_deepening(Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger);
+    void   alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger);
+    float  alpha_beta(size_t depth, float alpha, float beta, Player maximize, Player current, bool &trigger);
+    float  score(Player p);
 
     std::bitset<32> *white_pieces,
                     *black_pieces,

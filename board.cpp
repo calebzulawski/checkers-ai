@@ -234,7 +234,22 @@ void Board::apply_move(Player turn, size_t start, size_t jumped, size_t end) {
 /* ------------ */
 /* AI FUNCTIONS */
 /* ------------ */
-void Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> moves, Move &bestMove, bool &trigger) {
+size_t Board::iterative_deepening(Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger) {
+	size_t depth = 1;
+	size_t finished = 0;
+	Move m;
+	while (!trigger) {
+		alpha_beta_start(depth, maximize, moves, m, trigger);
+		if (!trigger) {
+			bestMove = m;
+			finished = depth;
+		}
+		depth++;
+	}
+	return finished;
+}
+
+void Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger) {
 	float v = std::numeric_limits<float>::lowest();
 	float alpha = std::numeric_limits<float>::lowest();
 	float beta = std::numeric_limits<float>::max();
@@ -248,7 +263,6 @@ void Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> mo
 		if (beta <= alpha)
 			break;
 	}
-	trigger = true;
 }
 
 float Board::alpha_beta(size_t depth, float alpha, float beta, Player maximize, Player current, bool &trigger) {

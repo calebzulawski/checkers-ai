@@ -7,8 +7,8 @@ EXECUTABLE=checkers-ai
 
 all: executable
 
-debug: CFLAGS += -g
-debug: LDFLAGS += -g
+debug: CFLAGS += -g -pg
+debug: LDFLAGS += -g -pg
 debug: executable
 
 executable: $(SOURCES) $(EXECUTABLE)

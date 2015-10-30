@@ -22,6 +22,7 @@ public:
         path     (m.path)
     {};
     Move& operator=(const Move& m) {
+        if (board) delete board;
         turn     = m.turn;
         board    = new Board(*m.board);
         start    = m.start;
