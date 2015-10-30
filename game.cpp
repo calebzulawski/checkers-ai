@@ -1,5 +1,6 @@
 #include "game.h"
 
+#include <cstdlib>
 #include <vector>
 #include <vector>
 #include <string>
