@@ -41,13 +41,16 @@ void Game::prompt() {
 			std::cout << "> " << std::endl;
 		}
 	}
-	std::cout << "Enter an AI search time limit:" << std::endl;
-	std::cout << "> ";
-	getline(std::cin, s);
-	ss.str(s);
-	ss.clear();
-	std::cout << ss.str() << std::endl;
-	ss >> searchTime;
+
+	while (searchTime == -1) {
+		std::cout << "Enter an AI search time limit:" << std::endl;
+		std::cout << "> ";
+		getline(std::cin, s);
+		ss.str(s);
+		ss.clear();
+		std::cout << ss.str() << std::endl;
+		ss >> searchTime;
+	}
 }
 
 void Game::list_moves(std::vector<Move> &v) {
@@ -152,12 +155,12 @@ void Game::takeTurn_player(std::vector<Move> &moves) {
 		std::string s;
 		getline(std::cin, s);
 		std::stringstream ss(s);
-		size_t index;
-		ss >> index;
+		size_t index = 1000;
+
 		if (std::cin.eof())
 			exit(0);
 
-		if (index < moves.size()) {
+		if((ss >> index) && !ss.rdbuf()->in_avail() && index < moves.size()) {
 			*board = *moves[index].board;
 			break;
 		} else {

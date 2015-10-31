@@ -29,7 +29,7 @@ public:
 
     bool   whiteIsAi,
            blackIsAi;
-    float  searchTime;
+    float  searchTime = -1;
     Board *board;
     Player turn = WHITE;
 
