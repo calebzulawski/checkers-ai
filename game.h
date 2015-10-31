@@ -24,6 +24,9 @@ public:
     void run();
     bool isAI(Player turn) { return (turn == WHITE && whiteIsAi) || (turn == BLACK && blackIsAi); };
 
+    void takeTurn_AI(std::vector<Move> &moves);
+    void takeTurn_player(std::vector<Move> &moves);
+
     bool   whiteIsAi,
            blackIsAi;
     float  searchTime;

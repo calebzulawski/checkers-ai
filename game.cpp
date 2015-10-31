@@ -104,59 +104,67 @@ void Game::run() {
 		if (moves.size() == 0)
 			break;
 
-		if (isAI(turn)) {
-			split_moves(moves, false);
-			Move bestMove;
-			if (moves.size() == 1) {
-				std::cout << "Selecting only posible move." << std::endl;
-				bestMove = moves.front();
-			} else {
-				bool trigger = false;
-				std::thread timerThread(timer, &trigger, searchTime);
-				auto start_time = std::chrono::high_resolution_clock::now();
-				size_t depth = board->iterative_deepening(turn, moves, bestMove, trigger);
-				auto end_time = std::chrono::high_resolution_clock::now();
-				auto diff_time = 1e-3 * std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-				timerThread.join();
-				if (depth == 0) {
-					std::cout << "Was not able to search the root depth in this time!" << std::endl;
-					bestMove = moves[rand() % moves.size()];
-				} else {
-					std::cout << "Searched to depth " << depth << " in " << diff_time << " seconds." << std::endl;
-				}
-			}
-			*board = *bestMove.board;
-			std::cout << "Press enter to continue..." << std::endl;
-			std::cin.get();
-		} else {
-			std::vector<size_t> path;
-			split_moves(moves, true);
-			list_moves(moves);
-			std::cout << (turn == WHITE ? "(WHITE)" : "(BLACK)") << " Enter move: ";
+		if (isAI(turn))
+			takeTurn_AI(moves);
+		else
+			takeTurn_player(moves);
 
-			while(true) {
-				std::string s;
-				getline(std::cin, s);
-				std::stringstream ss(s);
-				size_t index;
-				ss >> index;
-				if (std::cin.eof())
-					exit(0);
-
-				if (index < moves.size()) {
-					*board = *moves[index].board;
-					break;
-				} else {
-					std::cout << (turn == WHITE ? "(WHITE)" : "(BLACK)") << " Enter a valid move: ";
-					continue;
-				}
-			}
-		}
 		turnCount++;
-		turn = turn == WHITE ? BLACK : WHITE;
+		turn = (turn == WHITE) ? BLACK : WHITE;
 	}
 
 	std::cout << (turn == WHITE ? "BLACK" : "WHITE") << " wins!" << std::endl << "Game completed in " << turnCount << " turns." << std::endl;
+}
+
+void Game::takeTurn_AI(std::vector<Move> &moves) {
+	split_moves(moves, false);
+	Move bestMove;
+	if (moves.size() == 1) {
+		std::cout << "Selecting only posible move." << std::endl;
+		bestMove = moves.front();
+	} else {
+		bool trigger = false;
+		std::thread timerThread(timer, &trigger, searchTime);
+		auto start_time = std::chrono::high_resolution_clock::now();
+		size_t depth = board->iterative_deepening(turn, moves, bestMove, trigger);
+		auto end_time = std::chrono::high_resolution_clock::now();
+		auto diff_time = 1e-3 * std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+		timerThread.join();
+		if (depth == 0) {
+			std::cout << "Was not able to search the root depth in this time!" << std::endl;
+			bestMove = moves[rand() % moves.size()];
+		} else {
+			std::cout << "Searched to depth " << depth << " in " << diff_time << " seconds." << std::endl;
+		}
+	}
+	*board = *bestMove.board;
+	std::cout << "Press enter to continue..." << std::endl;
+	std::cin.get();
+}
+
+void Game::takeTurn_player(std::vector<Move> &moves) {
+	std::vector<size_t> path;
+	split_moves(moves, true);
+	list_moves(moves);
+	std::cout << (turn == WHITE ? "(WHITE)" : "(BLACK)") << " Enter move: ";
+
+	while(true) {
+		std::string s;
+		getline(std::cin, s);
+		std::stringstream ss(s);
+		size_t index;
+		ss >> index;
+		if (std::cin.eof())
+			exit(0);
+
+		if (index < moves.size()) {
+			*board = *moves[index].board;
+			break;
+		} else {
+			std::cout << (turn == WHITE ? "(WHITE)" : "(BLACK)") << " Enter a valid move: ";
+			continue;
+		}
+	}
 }
 
 void timer(bool *trigger, float searchTime) {
