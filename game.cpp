@@ -23,7 +23,6 @@ void Game::prompt() {
 	getline(std::cin, s);
 	std::stringstream ss(s);
 	while(ss >> selection) {
-		std::cout << "\t>" << std::endl;
 		if (selection == 1) {
 			whiteIsAi = false;
 			blackIsAi = true;
@@ -37,11 +36,16 @@ void Game::prompt() {
 			blackIsAi = true;
 			break;
 		}
+		else {
+			std::cout << "> " << std::endl;
+		}
 	}
 	std::cout << "Enter an AI search time limit:" << std::endl;
 	std::cout << "> ";
 	getline(std::cin, s);
 	ss.str(s);
+	ss.clear();
+	std::cout << ss.str() << std::endl;
 	ss >> searchTime;
 }
 
@@ -84,8 +88,7 @@ void Game::load(char *filename) {
 	else
 		turn = BLACK;
 
-	ifs >> val;
-	//eventually set this to search time
+	ifs >> searchTime;
 }
 
 void Game::run() {
@@ -112,7 +115,7 @@ void Game::run() {
 				auto start_time = std::chrono::high_resolution_clock::now();
 				size_t depth = board->iterative_deepening(turn, moves, bestMove, trigger);
 				auto end_time = std::chrono::high_resolution_clock::now();
-				auto diff_time = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
+				auto diff_time = 1e-3 * std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 				timerThread.join();
 				if (depth == 0) {
 					std::cout << "Was not able to search the root depth in this time!" << std::endl;
@@ -161,7 +164,8 @@ void timer(bool *trigger, float searchTime) {
 	while(!*trigger) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		auto end_time = std::chrono::high_resolution_clock::now();
-		if (std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count() > (timeFraction*searchTime))
+		auto diff_time = 1e-3 * std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+		if ( diff_time > (timeFraction*searchTime) )
 			*trigger = true;
 	}
 }

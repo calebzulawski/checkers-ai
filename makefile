@@ -7,8 +7,12 @@ EXECUTABLE=checkers-ai
 
 all: executable
 
-debug: CFLAGS += -g -pg
-debug: LDFLAGS += -g -pg
+prof: CFLAGS += -pg
+prof: LDFLAGS += -pg
+prof: debug
+
+debug: CFLAGS += -g
+debug: LDFLAGS += -g
 debug: executable
 
 executable: $(SOURCES) $(EXECUTABLE)
@@ -22,3 +26,4 @@ $(EXECUTABLE): $(OBJECTS)
 clean:
 	rm *.o
 	rm checkers-ai
+	rm gmon.out

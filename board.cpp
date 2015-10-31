@@ -122,19 +122,19 @@ bool Board::opponent_piece(Player p, size_t i) {
 }
 
 bool Board::is_white_piece(Player p, size_t i) {
-	return (white_pieces->test(i) && p == WHITE);
+	return (p == WHITE && white_pieces->test(i));
 }
 
 bool Board::is_black_piece(Player p, size_t i) {
-	return (black_pieces->test(i) && p == BLACK);
+	return (p == BLACK && black_pieces->test(i));
 }
 
 bool Board::is_white_king(Player p, size_t i) {
-	return (white_kings->test(i)  && p == WHITE);
+	return (p == WHITE && white_kings->test(i));
 }
 
 bool Board::is_black_king(Player p, size_t i) {
-	return (black_kings->test(i)  && p == BLACK);
+	return (p == BLACK && black_kings->test(i));
 }
 
 void Board::jumps_from_square(size_t i, Player p, std::vector<Move> &v) {
