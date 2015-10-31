@@ -240,7 +240,8 @@ size_t Board::iterative_deepening(Player maximize, std::vector<Move> &moves, Mov
 	size_t finished = 0;
 	Move m;
 	while (!trigger) {
-		alpha_beta_start(depth, maximize, moves, m, trigger);
+		// alpha_beta_start(depth, maximize, moves, m, trigger);
+		negamax_start(depth, maximize, moves, m, trigger);
 		if (!trigger) {
 			bestMove = m;
 			finished = depth;
@@ -248,6 +249,46 @@ size_t Board::iterative_deepening(Player maximize, std::vector<Move> &moves, Mov
 		depth++;
 	}
 	return finished;
+}
+
+void Board::negamax_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger) {
+	float v = std::numeric_limits<float>::lowest();
+	float alpha = std::numeric_limits<float>::lowest();
+	float beta = std::numeric_limits<float>::max();
+
+	for (auto move : moves) {
+		float v_new = -move.board->negamax(depth-1, -beta, -alpha, other_player(maximize), trigger);
+		if (v_new > v) {
+			v = v_new;
+			bestMove = move;
+		}
+		alpha = std::max(alpha, v);
+		if (beta <= alpha)
+			break;
+	}
+}
+
+float Board::negamax(size_t depth, float alpha, float beta, Player p, bool &trigger) {
+	if (depth == 0 || trigger)
+		return score(p);
+	
+	std::vector<Move> moves;
+	possible_moves(p, moves);
+
+
+	if (moves.size() == 0)
+		return score(p);
+
+	float v = std::numeric_limits<float>::lowest();
+	for (auto move : moves) {
+		float v_new = -move.board->negamax(depth-1, -beta, -alpha, other_player(p), trigger);
+		v = std::max(v, v_new);
+		alpha = std::max(alpha, v);
+		if (beta <= alpha)
+			break;
+	}
+
+	return v;
 }
 
 void Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger) {
