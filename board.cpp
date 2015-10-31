@@ -65,16 +65,16 @@ void Board::display() {
 					}
 				}
 				else if (j == 1) {
-					if (white_kings->test(i)) {
+					if ((*white_kings)[i]) {
 						std::cout << "  " << white_bg << white_text << "K " << red_bg << "  ";
 					}
-					else if (black_kings->test(i)) {
+					else if ((*black_kings)[i]) {
 						std::cout << "  " << black_bg << black_text << "K " << red_bg << "  ";
 					}
-					else if (white_pieces->test(i)) {
+					else if ((*white_pieces)[i]) {
 						std::cout << "  " << white_bg << white_text << "  " << red_bg << "  ";
 					}
-					else if (black_pieces->test(i)) {
+					else if ((*black_pieces)[i]) {
 						std::cout << "  " << black_bg << black_text << "  " << red_bg << "  ";
 					}
 					else {
@@ -115,27 +115,27 @@ void Board::display() {
 }
 
 bool Board::no_piece(size_t i) {
-	return !white_pieces->test(i) && !black_pieces->test(i);
+	return !(*white_pieces)[i] && !(*black_pieces)[i];
 }
 
 bool Board::opponent_piece(Player p, size_t i) {
-	return p == WHITE ? black_pieces->test(i) : white_pieces->test(i);
+	return p == WHITE ? (*black_pieces)[i] : (*white_pieces)[i];
 }
 
 bool Board::is_white_piece(Player p, size_t i) {
-	return (p == WHITE && white_pieces->test(i));
+	return (p == WHITE && (*white_pieces)[i]);
 }
 
 bool Board::is_black_piece(Player p, size_t i) {
-	return (p == BLACK && black_pieces->test(i));
+	return (p == BLACK && (*black_pieces)[i]);
 }
 
 bool Board::is_white_king(Player p, size_t i) {
-	return (p == WHITE && white_kings->test(i));
+	return (p == WHITE && (*white_kings)[i]);
 }
 
 bool Board::is_black_king(Player p, size_t i) {
-	return (p == BLACK && black_kings->test(i));
+	return (p == BLACK && (*black_kings)[i]);
 }
 
 void Board::jumps_from_square(size_t i, Player p, std::vector<Move> &v) {
@@ -201,22 +201,22 @@ void Board::possible_moves(Player turn, std::vector<Move> &moves) {
 
 void Board::apply_move(Player turn, size_t start, size_t end) {
 	if (turn == WHITE) {
-		white_pieces->reset(start);
-		white_pieces->set(end);
+		(*white_pieces)[start] = 0;
+		(*white_pieces)[end]   = 1;
 		if (end > 27)
-			white_kings->set(end);
-		if (white_kings->test(start)) {
-			white_kings->reset(start);
-			white_kings->set(end);
+			(*white_kings)[end] = 1;
+		if ((*white_kings)[start]) {
+			(*white_kings)[start] = 0;
+			(*white_kings)[end]   = 1;
 		}
 	} else {
-		black_pieces->reset(start);
-		black_pieces->set(end);
+		(*black_pieces)[start] = 0;
+		(*black_pieces)[end]   = 1;
 		if (end < 4)
-			black_kings->set(end);
-		if (black_kings->test(start)) {
-			black_kings->reset(start);
-			black_kings->set(end);
+			(*black_kings)[end] = 1;
+		if ((*black_kings)[start]) {
+			(*black_kings)[start] = 0;
+			(*black_kings)[end]   = 1;
 		}
 	}
 }
@@ -224,11 +224,11 @@ void Board::apply_move(Player turn, size_t start, size_t end) {
 void Board::apply_move(Player turn, size_t start, size_t jumped, size_t end) {
 	apply_move(turn, start, end);
 	if (turn == WHITE) {
-		black_pieces->reset(jumped);
-		black_kings->reset(jumped);
+		(*black_pieces)[jumped] = 0;
+		(*black_kings )[jumped] = 0;
 	} else {
-		white_pieces->reset(jumped);
-		white_kings->reset(jumped);
+		(*white_pieces)[jumped] = 0;
+		(*white_kings )[jumped] = 0;
 	}
 }
 
@@ -272,7 +272,6 @@ float Board::alpha_beta(size_t depth, float alpha, float beta, Player maximize, 
 	
 	std::vector<Move> moves;
 	possible_moves(current, moves);
-
 
 	if (moves.size() == 0)
 		return score(maximize);
