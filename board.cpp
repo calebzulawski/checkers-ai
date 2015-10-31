@@ -242,8 +242,6 @@ size_t Board::iterative_deepening(Player maximize, std::vector<Move> &moves, Mov
 	while (!trigger) {
 		std::cout << "-----------------" << std::endl;
 		alpha_beta_start(depth, maximize, moves, m, trigger);
-		// negamax_start(depth, maximize, moves, m, trigger);
-		// std::cin.get();
 		if (!trigger) {
 			bestMove = m;
 			finished = depth;
@@ -254,7 +252,7 @@ size_t Board::iterative_deepening(Player maximize, std::vector<Move> &moves, Mov
 }
 
 void Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger) {
-	int alpha = std::numeric_limits<int>::lowest();
+	int alpha = std::numeric_limits<int>::min();
 	int beta = std::numeric_limits<int>::max();
 	for (auto move : moves) {
 		int v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(maximize), trigger);
