@@ -58,11 +58,9 @@ public:
 
     // AI
     size_t iterative_deepening(Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger);
-    // void   negamax_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger);
-    // float  negamax(size_t depth, float alpha, float beta, Player p, bool &trigger);
-    void alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger);
-    int  alpha_beta(size_t depth, int alpha, int beta, Player maximize, Player current, bool &trigger);
-    int  score(Player p);
+    void   alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger);
+    int    alpha_beta(size_t depth, int alpha, int beta, Player maximize, Player current, bool &trigger);
+    int    score(Player p);
     inline int score_0();
     inline int score_1();
     inline int score_2();

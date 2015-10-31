@@ -142,24 +142,24 @@ void Board::jumps_from_square(size_t i, Player p, std::vector<Move> &v) {
 	bool oddrow = (((i - (i % 4))/4) % 2);
 	size_t posInRow = i % 4;
 	if ( i < 24 && (is_white_piece(p, i) || is_black_king(p, i)) ) {
-		if (posInRow < 3 && !oddrow && opponent_piece(p, i+5) && no_piece(i+9))
-			v.push_back(Move(p, this, i, i+5, i+9));
+		if (posInRow > 0 && oddrow && opponent_piece(p, i+3) && no_piece(i+7))
+			v.push_back(Move(p, this, i, i+3, i+7));
 		if (posInRow > 0 && !oddrow && opponent_piece(p, i+4) && no_piece(i+7))
 			v.push_back(Move(p, this, i, i+4, i+7));
 		if (posInRow < 3 && oddrow && opponent_piece(p, i+4) && no_piece(i+9))
 			v.push_back(Move(p, this, i, i+4, i+9));
-		if (posInRow > 0 && oddrow && opponent_piece(p, i+3) && no_piece(i+7))
-			v.push_back(Move(p, this, i, i+3, i+7));
+		if (posInRow < 3 && !oddrow && opponent_piece(p, i+5) && no_piece(i+9))
+			v.push_back(Move(p, this, i, i+5, i+9));
 	}
 	if ( i > 7 && (is_black_piece(p, i) || is_white_king(p, i)) ) {
-		if (posInRow < 3 && !oddrow && opponent_piece(p, i-3) && no_piece(i-7))
-			v.push_back(Move(p, this, i, i-3, i-7));
+		if (posInRow > 0 && oddrow && opponent_piece(p, i-5) && no_piece(i-9))
+			v.push_back(Move(p, this, i, i-5, i-9));
 		if (posInRow > 0 && !oddrow && opponent_piece(p, i-4) && no_piece(i-9))
 			v.push_back(Move(p, this, i, i-4, i-9));
 		if (posInRow < 3 && oddrow && opponent_piece(p, i-4) && no_piece(i-7))
 			v.push_back(Move(p, this, i, i-4, i-7));
-		if (posInRow > 0 && oddrow && opponent_piece(p, i-5) && no_piece(i-9))
-			v.push_back(Move(p, this, i, i-5, i-9));
+		if (posInRow < 3 && !oddrow && opponent_piece(p, i-3) && no_piece(i-7))
+			v.push_back(Move(p, this, i, i-3, i-7));
 	}
 	return;
 }
@@ -168,24 +168,24 @@ void Board::shifts_from_square(size_t i, Player p, std::vector<Move> &v) {
 	bool oddrow = (((i - (i % 4))/4) % 2);
 	size_t posInRow = i % 4;
 	if ( i < 28 && (is_white_piece(p, i) || is_black_king(p, i)) ) {
-		if (posInRow < 3 && !oddrow && no_piece(i+5))
-			v.push_back(std::move(Move(p, this, i, i+5)));
-		if (!oddrow && no_piece(i+4))
-			v.push_back(std::move(Move(p, this, i, i+4)));
 		if (posInRow > 0 && oddrow && no_piece(i+3))
 			v.push_back(std::move(Move(p, this, i, i+3)));
+		if (!oddrow && no_piece(i+4))
+			v.push_back(std::move(Move(p, this, i, i+4)));
 		if (oddrow && no_piece(i+4))
 			v.push_back(std::move(Move(p, this, i, i+4)));
+		if (posInRow < 3 && !oddrow && no_piece(i+5))
+			v.push_back(std::move(Move(p, this, i, i+5)));
 	}
 	if ( i > 3 && (is_black_piece(p, i) || is_white_king(p, i)) ) {
-		if (posInRow < 3 && !oddrow && no_piece(i-3))
-			v.push_back(std::move(Move(p, this, i, i-3)));
-		if (!oddrow && no_piece(i-4))
-			v.push_back(std::move(Move(p, this, i, i-4)));
 		if (posInRow > 0 && oddrow && no_piece(i-5))
 			v.push_back(std::move(Move(p, this, i, i-5)));
+		if (!oddrow && no_piece(i-4))
+			v.push_back(std::move(Move(p, this, i, i-4)));
 		if (oddrow && no_piece(i-4))
 			v.push_back(std::move(Move(p, this, i, i-4)));
+		if (posInRow < 3 && !oddrow && no_piece(i-3))
+			v.push_back(std::move(Move(p, this, i, i-3)));
 	}
 }
 
@@ -253,66 +253,20 @@ size_t Board::iterative_deepening(Player maximize, std::vector<Move> &moves, Mov
 	return finished;
 }
 
-// void Board::negamax_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger) {
-// 	float v = std::numeric_limits<float>::lowest();
-// 	float alpha = std::numeric_limits<float>::lowest();
-// 	float beta = std::numeric_limits<float>::max();
-
-// 	for (auto move : moves) {
-// 		float v_new = -move.board->negamax(depth-1, -beta, -alpha, other_player(maximize), trigger);
-// 		// for (int i = 0; i < depth; i++)
-// 		// 	std::cout << "  ";
-// 		// std::cout << v_new << std::endl;
-// 		if (v_new > v) {
-// 			v = v_new;
-// 			bestMove = move;
-// 		}
-// 		alpha = std::max(alpha, v);
-// 		if (beta <= alpha)
-// 			break;
-// 	}
-// }
-
-// float Board::negamax(size_t depth, float alpha, float beta, Player p, bool &trigger) {
-// 	if (depth == 0 || trigger)
-// 		return score(p);
-	
-// 	std::vector<Move> moves;
-// 	possible_moves(p, moves);
-
-
-// 	if (moves.size() == 0)
-// 		return score(p);
-
-// 	float v = std::numeric_limits<float>::lowest();
-// 	for (auto move : moves) {
-// 		float v_new = -move.board->negamax(depth-1, -beta, -alpha, other_player(p), trigger);
-// 		// for (int i = 0; i < depth; i++)
-// 			// std::cout << "  ";
-// 		// std::cout << v_new << std::endl;
-// 		v = std::max(v, v_new);
-// 		alpha = std::max(alpha, v);
-// 		if (beta <= alpha)
-// 			break;
-// 	}
-
-// 	return v;
-// }
-
 void Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger) {
 	int alpha = std::numeric_limits<int>::lowest();
 	int beta = std::numeric_limits<int>::max();
 	for (auto move : moves) {
-		int v_new = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(maximize), trigger);
-		// std::cout << v_new << "  ";
-		if (v_new > alpha) {
-			alpha = v_new;
+		int v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(maximize), trigger);
+		std::cout << v << "  ";
+		if (v > alpha) {
+			alpha = v;
 			bestMove = move;
 		}
-		// if (beta <= alpha)
-		// 	break;
+		if (beta <= alpha)
+			break;
 	}
-	// std::cout << std::endl;
+	std::cout << std::endl;
 }
 
 int Board::alpha_beta(size_t depth, int alpha, int beta, Player maximize, Player current, bool &trigger) {
@@ -322,23 +276,26 @@ int Board::alpha_beta(size_t depth, int alpha, int beta, Player maximize, Player
 	std::vector<Move> moves;
 	possible_moves(current, moves);
 
-	if (moves.size() == 0)
-		return score(maximize);
+	if (moves.size() == 0) {
+		if (current == maximize)
+			return std::numeric_limits<int>::lowest();
+		return std::numeric_limits<int>::max();
+	}
 
 	if (current == maximize) {
 		for (auto move : moves) {
-			int v_new = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current), trigger);
-			alpha = std::max(alpha, v_new);
-			// if (beta <= alpha)
-			// 	break;
+			int v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current), trigger);
+			alpha = std::max(alpha, v);
+			if (beta <= alpha)
+				break;
 		}
 		return alpha;
 	} else {
 		for (auto move : moves) {
-			int v_new = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current), trigger);
-			beta = std::min(beta, v_new) ;
-			// if (beta <= alpha)
-			// 	break;
+			int v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current), trigger);
+			beta = std::min(beta, v) ;
+			if (beta <= alpha)
+				break;
 		}
 		return beta;
 	}
@@ -346,9 +303,9 @@ int Board::alpha_beta(size_t depth, int alpha, int beta, Player maximize, Player
 
 int Board::score(Player p) {
 	int metric = 0;
-	metric += score_0() * 1e8;
-	metric += score_1() * 1e6;
-	metric += score_2() * 1e4;
+	metric += score_0() * 1e6;
+	metric += score_1() * 1e4;
+	metric += score_2() * 1e2;
 
 	metric += rand() % 100;
 
