@@ -253,69 +253,69 @@ size_t Board::iterative_deepening(Player maximize, std::vector<Move> &moves, Mov
 	return finished;
 }
 
-void Board::negamax_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger) {
-	float v = std::numeric_limits<float>::lowest();
-	float alpha = std::numeric_limits<float>::lowest();
-	float beta = std::numeric_limits<float>::max();
+// void Board::negamax_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger) {
+// 	float v = std::numeric_limits<float>::lowest();
+// 	float alpha = std::numeric_limits<float>::lowest();
+// 	float beta = std::numeric_limits<float>::max();
 
-	for (auto move : moves) {
-		float v_new = -move.board->negamax(depth-1, -beta, -alpha, other_player(maximize), trigger);
-		// for (int i = 0; i < depth; i++)
-		// 	std::cout << "  ";
-		// std::cout << v_new << std::endl;
-		if (v_new > v) {
-			v = v_new;
-			bestMove = move;
-		}
-		alpha = std::max(alpha, v);
-		if (beta <= alpha)
-			break;
-	}
-}
+// 	for (auto move : moves) {
+// 		float v_new = -move.board->negamax(depth-1, -beta, -alpha, other_player(maximize), trigger);
+// 		// for (int i = 0; i < depth; i++)
+// 		// 	std::cout << "  ";
+// 		// std::cout << v_new << std::endl;
+// 		if (v_new > v) {
+// 			v = v_new;
+// 			bestMove = move;
+// 		}
+// 		alpha = std::max(alpha, v);
+// 		if (beta <= alpha)
+// 			break;
+// 	}
+// }
 
-float Board::negamax(size_t depth, float alpha, float beta, Player p, bool &trigger) {
-	if (depth == 0 || trigger)
-		return score(p);
+// float Board::negamax(size_t depth, float alpha, float beta, Player p, bool &trigger) {
+// 	if (depth == 0 || trigger)
+// 		return score(p);
 	
-	std::vector<Move> moves;
-	possible_moves(p, moves);
+// 	std::vector<Move> moves;
+// 	possible_moves(p, moves);
 
 
-	if (moves.size() == 0)
-		return score(p);
+// 	if (moves.size() == 0)
+// 		return score(p);
 
-	float v = std::numeric_limits<float>::lowest();
-	for (auto move : moves) {
-		float v_new = -move.board->negamax(depth-1, -beta, -alpha, other_player(p), trigger);
-		// for (int i = 0; i < depth; i++)
-			// std::cout << "  ";
-		// std::cout << v_new << std::endl;
-		v = std::max(v, v_new);
-		alpha = std::max(alpha, v);
-		if (beta <= alpha)
-			break;
-	}
+// 	float v = std::numeric_limits<float>::lowest();
+// 	for (auto move : moves) {
+// 		float v_new = -move.board->negamax(depth-1, -beta, -alpha, other_player(p), trigger);
+// 		// for (int i = 0; i < depth; i++)
+// 			// std::cout << "  ";
+// 		// std::cout << v_new << std::endl;
+// 		v = std::max(v, v_new);
+// 		alpha = std::max(alpha, v);
+// 		if (beta <= alpha)
+// 			break;
+// 	}
 
-	return v;
-}
+// 	return v;
+// }
 
 void Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger) {
-	float v = std::numeric_limits<float>::lowest();
-	float alpha = std::numeric_limits<float>::lowest();
-	float beta = std::numeric_limits<float>::max();
+	int alpha = std::numeric_limits<int>::lowest();
+	int beta = std::numeric_limits<int>::max();
 	for (auto move : moves) {
-		float v_new = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(maximize), trigger);
-		if (v_new > v) {
-			v = v_new;
+		int v_new = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(maximize), trigger);
+		// std::cout << v_new << "  ";
+		if (v_new > alpha) {
+			alpha = v_new;
 			bestMove = move;
 		}
-		alpha = std::max(alpha, v);
-		if (beta <= alpha)
-			break;
+		// if (beta <= alpha)
+		// 	break;
 	}
+	// std::cout << std::endl;
 }
 
-float Board::alpha_beta(size_t depth, float alpha, float beta, Player maximize, Player current, bool &trigger) {
+int Board::alpha_beta(size_t depth, int alpha, int beta, Player maximize, Player current, bool &trigger) {
 	if (depth == 0 || trigger)
 		return score(maximize);
 	
@@ -326,37 +326,60 @@ float Board::alpha_beta(size_t depth, float alpha, float beta, Player maximize, 
 		return score(maximize);
 
 	if (current == maximize) {
-		float v = std::numeric_limits<float>::lowest();
-		// float v = alpha;
 		for (auto move : moves) {
-			float v_new = move.board->alpha_beta(depth-1, v, beta, maximize, other_player(current), trigger);
-			v = std::max(v, v_new);
-			alpha = std::max(alpha, v);
-			if (beta <= alpha)
-				break;
+			int v_new = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current), trigger);
+			alpha = std::max(alpha, v_new);
+			// if (beta <= alpha)
+			// 	break;
 		}
-		return v;
+		return alpha;
 	} else {
-		float v = std::numeric_limits<float>::max();
-		// float v = beta;
 		for (auto move : moves) {
-			float v_new = move.board->alpha_beta(depth-1, alpha, v, maximize, other_player(current), trigger);
-			v = std::min(v, v_new) ;
-			beta = std::min(beta, v);
-			if (beta <= alpha)
-				break;
+			int v_new = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current), trigger);
+			beta = std::min(beta, v_new) ;
+			// if (beta <= alpha)
+			// 	break;
 		}
-		return v;
+		return beta;
 	}
 }
 
-float Board::score(Player p) {
-	const float king_weight = 5;
-	const float norm_weight = 3;
-	float metric = (king_weight - norm_weight) * white_kings->count()
-	             - (king_weight - norm_weight) * black_kings->count()
-	             + norm_weight * white_pieces->count()
-	             - norm_weight * black_pieces->count()
-	             + (rand()%100)/1000.;
+int Board::score(Player p) {
+	int metric = 0;
+	metric += score_0() * 1e8;
+	metric += score_1() * 1e6;
+	metric += score_2() * 1e4;
+
+	metric += rand() % 100;
+
 	return p == WHITE ? metric : -metric;
+}
+
+int Board::score_0() {
+	const int king_weight = 2;
+	const int base_weight = 3;
+	return   king_weight * white_kings->count()
+	       - king_weight * black_kings->count()
+	       + base_weight * white_pieces->count()
+	       - base_weight * black_pieces->count();
+}
+
+int Board::score_1() {
+	int metric = 0;
+	for (size_t i = 0; i < 32; i++) {
+		int row = i/4;
+		if ( (*white_pieces)[i] && !(*white_kings)[i] )
+			metric += row;
+		if ( (*black_pieces)[i] && !(*black_kings)[i] )
+			metric -= (7-row);
+		if ( row == 0 && (*white_pieces)[i] )
+			metric += 5;
+		if ( row == 7 && (*black_pieces)[i] )
+			metric -= 5;
+	}
+	return metric;
+}
+
+int Board::score_2() {
+	return white_pieces->count() - black_pieces->count();
 }
