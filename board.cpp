@@ -259,7 +259,7 @@ void Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &m
 		int v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(maximize), trigger);
 		std::cout << v << "  ";
 		if (v > best) {
-			// alpha = v;
+			alpha = v;
 			best = v;
 			bestMove = move;
 		}
@@ -303,7 +303,7 @@ int Board::alpha_beta(size_t depth, int alpha, int beta, Player maximize, Player
 
 int Board::score(Player p) {
 	int metric = 0;
-	metric += score_0() * 1e6;
+	metric += score_0() * 1e7;
 	metric += score_1() * 1e4;
 	metric += score_2() * 1e2;
 
@@ -326,9 +326,9 @@ int Board::score_1() {
 	for (size_t i = 0; i < 32; i++) {
 		int row = i/4;
 		if ( (*white_pieces)[i] && !(*white_kings)[i] )
-			metric += row;
+			metric += row*row;
 		if ( (*black_pieces)[i] && !(*black_kings)[i] )
-			metric -= (7-row);
+			metric -= (7-row)*(7-row);
 		if ( row == 0 && (*white_pieces)[i] )
 			metric += 5;
 		if ( row == 7 && (*black_pieces)[i] )
