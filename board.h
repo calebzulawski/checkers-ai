@@ -6,7 +6,6 @@ class Move;
 
 #include <bitset>
 #include <vector>
-#include <vector>
 
 #include "constants.h"
 
@@ -53,8 +52,8 @@ public:
     void possible_moves(Player turn, std::vector<Move> &moves);
     void jumps_from_square(size_t i, Player p, std::vector<Move> &v);
     void shifts_from_square(size_t i, Player p, std::vector<Move> &v);
-    void apply_move(Player turn, size_t start, size_t end);
-    void apply_move(Player turn, size_t start, size_t jumped, size_t end);
+    bool apply_move(Player turn, size_t start, size_t end);
+    bool apply_move(Player turn, size_t start, size_t jumped, size_t end);
 
     // AI
     size_t iterative_deepening(Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger);

@@ -1,7 +1,6 @@
 #include <cstdlib>
 #include <bitset>
 #include <vector>
-#include <vector>
 #include <string>
 #include <iostream>
 #include <limits>
@@ -199,12 +198,16 @@ void Board::possible_moves(Player turn, std::vector<Move> &moves) {
 	}
 }
 
-void Board::apply_move(Player turn, size_t start, size_t end) {
+// Returns true if the move resulted in a crowned/kinged piece
+bool Board::apply_move(Player turn, size_t start, size_t end) {
+	bool ret = false;
 	if (turn == WHITE) {
 		(*white_pieces)[start] = 0;
 		(*white_pieces)[end]   = 1;
-		if (end > 27)
+		if ( end > 27 && !(*white_kings)[start] ) {
+			ret = true;
 			(*white_kings)[end] = 1;
+		}
 		if ((*white_kings)[start]) {
 			(*white_kings)[start] = 0;
 			(*white_kings)[end]   = 1;
@@ -212,17 +215,19 @@ void Board::apply_move(Player turn, size_t start, size_t end) {
 	} else {
 		(*black_pieces)[start] = 0;
 		(*black_pieces)[end]   = 1;
-		if (end < 4)
+		if ( end < 4 && !(*black_kings)[start] ) {
+			ret = true;
 			(*black_kings)[end] = 1;
+		}
 		if ((*black_kings)[start]) {
 			(*black_kings)[start] = 0;
 			(*black_kings)[end]   = 1;
 		}
 	}
+	return ret;
 }
 
-void Board::apply_move(Player turn, size_t start, size_t jumped, size_t end) {
-	apply_move(turn, start, end);
+bool Board::apply_move(Player turn, size_t start, size_t jumped, size_t end) {
 	if (turn == WHITE) {
 		(*black_pieces)[jumped] = 0;
 		(*black_kings )[jumped] = 0;
@@ -230,6 +235,7 @@ void Board::apply_move(Player turn, size_t start, size_t jumped, size_t end) {
 		(*white_pieces)[jumped] = 0;
 		(*white_kings )[jumped] = 0;
 	}
+	return apply_move(turn, start, end);
 }
 
 /* ------------ */

@@ -28,8 +28,8 @@ Move::Move(Player p, Board *b, size_t start_, size_t jumped_, size_t end_) :
 	end(end_),
 	jump(true)
 {
-	board->apply_move(turn, start, jumped_, end);
-	board->jumps_from_square(end, turn, children);
+	if (!board->apply_move(turn, start, jumped_, end))
+		board->jumps_from_square(end, turn, children);
 }
 
 void Move::display() {
