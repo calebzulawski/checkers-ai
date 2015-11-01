@@ -266,12 +266,12 @@ void Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &m
 		int64_t v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(maximize), trigger);
 		std::cout << v << "  ";
 		if (v > best) {
-			// alpha = v;
+			alpha = v;
 			best = v;
 			bestMove = move;
 		}
-		// if (beta <= alpha)
-		// 	break;
+		if (beta <= alpha)
+			break;
 	}
 	std::cout << std::endl;
 }
@@ -282,6 +282,7 @@ int64_t Board::alpha_beta(size_t depth, int64_t alpha, int64_t beta, Player maxi
 	
 	std::vector<Move> moves;
 	possible_moves(current, moves);
+	split_moves(moves, false);
 
 	if (moves.size() == 0) {
 		if (current == maximize)
@@ -293,16 +294,16 @@ int64_t Board::alpha_beta(size_t depth, int64_t alpha, int64_t beta, Player maxi
 		for (auto move : moves) {
 			int64_t v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current), trigger);
 			alpha = std::max(alpha, v);
-			// if (beta <= alpha)
-			// 	break;
+			if (beta <= alpha)
+				break;
 		}
 		return alpha;
 	} else {
 		for (auto move : moves) {
 			int64_t v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current), trigger);
 			beta = std::min(beta, v) ;
-			// if (beta <= alpha)
-			// 	break;
+			if (beta <= alpha)
+				break;
 		}
 		return beta;
 	}
@@ -310,11 +311,11 @@ int64_t Board::alpha_beta(size_t depth, int64_t alpha, int64_t beta, Player maxi
 
 int64_t Board::score(Player p) {
 	int metric = 0;
-	metric += score_0() * 1e0;
-	// metric += score_1() * 1e4;
-	// metric += score_2() * 1e2;
+	metric += score_0() * 1e7;
+	metric += score_1() * 1e4;
+	metric += score_2() * 1e2;
 
-	// metric += rand() % 100;
+	metric += rand() % 100;
 
 	return p == WHITE ? metric : -metric;
 }
