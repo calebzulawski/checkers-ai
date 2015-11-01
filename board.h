@@ -1,6 +1,8 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include <cstdint>
+
 //Forward declaration
 class Move;
 
@@ -56,13 +58,13 @@ public:
     bool apply_move(Player turn, size_t start, size_t jumped, size_t end);
 
     // AI
-    size_t iterative_deepening(Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger);
-    void   alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger);
-    int    alpha_beta(size_t depth, int alpha, int beta, Player maximize, Player current, bool &trigger);
-    int    score(Player p);
-    inline int score_0();
-    inline int score_1();
-    inline int score_2();
+    size_t  iterative_deepening(Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger);
+    void    alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger);
+    int64_t alpha_beta(size_t depth, int64_t alpha, int64_t beta, Player maximize, Player current, bool &trigger);
+    int64_t score(Player p);
+    inline int64_t score_0();
+    inline int64_t score_1();
+    inline int64_t score_2();
 
     std::bitset<32> *white_pieces,
                     *black_pieces,

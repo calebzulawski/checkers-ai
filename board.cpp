@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <limits>
+#include <cstdint>
 
 #include "board.h"
 #include "move.h"
@@ -258,11 +259,11 @@ size_t Board::iterative_deepening(Player maximize, std::vector<Move> &moves, Mov
 }
 
 void Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger) {
-	int alpha = std::numeric_limits<int>::min();
-	int beta = std::numeric_limits<int>::max();
-	int best = std::numeric_limits<int>::min();
+	int64_t alpha = std::numeric_limits<int64_t>::min();
+	int64_t beta = std::numeric_limits<int64_t>::max();
+	int64_t best = std::numeric_limits<int64_t>::min();
 	for (auto move : moves) {
-		int v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(maximize), trigger);
+		int64_t v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(maximize), trigger);
 		std::cout << v << "  ";
 		if (v > best) {
 			// alpha = v;
@@ -275,7 +276,7 @@ void Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &m
 	std::cout << std::endl;
 }
 
-int Board::alpha_beta(size_t depth, int alpha, int beta, Player maximize, Player current, bool &trigger) {
+int64_t Board::alpha_beta(size_t depth, int64_t alpha, int64_t beta, Player maximize, Player current, bool &trigger) {
 	if (depth == 0 || trigger)
 		return score(maximize);
 	
@@ -284,13 +285,13 @@ int Board::alpha_beta(size_t depth, int alpha, int beta, Player maximize, Player
 
 	if (moves.size() == 0) {
 		if (current == maximize)
-			return std::numeric_limits<int>::lowest();
-		return std::numeric_limits<int>::max();
+			return std::numeric_limits<int64_t>::lowest();
+		return std::numeric_limits<int64_t>::max();
 	}
 
 	if (current == maximize) {
 		for (auto move : moves) {
-			int v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current), trigger);
+			int64_t v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current), trigger);
 			alpha = std::max(alpha, v);
 			// if (beta <= alpha)
 			// 	break;
@@ -298,7 +299,7 @@ int Board::alpha_beta(size_t depth, int alpha, int beta, Player maximize, Player
 		return alpha;
 	} else {
 		for (auto move : moves) {
-			int v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current), trigger);
+			int64_t v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current), trigger);
 			beta = std::min(beta, v) ;
 			// if (beta <= alpha)
 			// 	break;
@@ -307,7 +308,7 @@ int Board::alpha_beta(size_t depth, int alpha, int beta, Player maximize, Player
 	}
 }
 
-int Board::score(Player p) {
+int64_t Board::score(Player p) {
 	int metric = 0;
 	metric += score_0() * 1e0;
 	// metric += score_1() * 1e4;
@@ -318,16 +319,16 @@ int Board::score(Player p) {
 	return p == WHITE ? metric : -metric;
 }
 
-int Board::score_0() {
-	const int king_weight = 1;
-	const int base_weight = 2;
-	return   (king_weight * white_kings->count() )
-	       - (king_weight * black_kings->count() )
-	       + (base_weight * white_pieces->count())
-	       - (base_weight * black_pieces->count());
+int64_t Board::score_0() {
+	const int king_weight = 2;
+	const int base_weight = 3;
+	return   king_weight * white_kings->count()
+	       - king_weight * black_kings->count()
+	       + base_weight * white_pieces->count()
+	       - base_weight * black_pieces->count();
 }
 
-int Board::score_1() {
+int64_t Board::score_1() {
 	int metric = 0;
 	for (size_t i = 0; i < 32; i++) {
 		int row = i/4;
@@ -343,6 +344,6 @@ int Board::score_1() {
 	return metric;
 }
 
-int Board::score_2() {
+int64_t Board::score_2() {
 	return white_pieces->count() - black_pieces->count();
 }
