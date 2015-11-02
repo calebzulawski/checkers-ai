@@ -72,7 +72,14 @@ public:
                     *white_kings,
                     *black_kings;
 
-    static constexpr std::bitset<32> diagonal_mask = std::bitset<32>(0x8CC66331);
+    static constexpr int endgame_weights[] = {  9,  3,  0,  0,
+                                              9,  3,  0,  0,
+                                                3,  0,  0,  0,
+                                              3,  0,  0,  0,
+                                                0,  0,  0,  3,
+                                              0,  0,  0,  3,
+                                                0,  0,  3,  9,
+                                              0,  0,  3,  9  };
 
 private:
 };

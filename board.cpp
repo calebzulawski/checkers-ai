@@ -10,7 +10,7 @@
 #include "move.h"
 #include "constants.h"
 
-constexpr std::bitset<32> Board::diagonal_mask;
+constexpr int Board::endgame_weights[];
 
 Board::~Board() {
     delete white_pieces;
@@ -322,10 +322,10 @@ int64_t Board::alpha_beta(size_t depth, int64_t alpha, int64_t beta, Player maxi
 
 int64_t Board::score(Player p) {
     int metric = 0;
-    metric += score_0() * 1e9;
-    metric += score_1() * 1e6;
-    metric += score_2() * 1e4;
-    metric += score_3() * 1e2;
+    metric += score_0() * 1e12;
+    metric += score_1() * 1e9;
+    metric += score_2() * 1e6;
+    metric += score_3() * 1e3;
 
     metric += rand() % 100;
 
@@ -341,7 +341,7 @@ int64_t Board::score_0() {
            - base_weight * black_pieces->count();
 }
 
-int64_t Board::score_1() {
+int64_t Board::score_3() {
     int metric = 0;
     for (size_t i = 0; i < 32; i++) {
         int row = i/4;
@@ -357,15 +357,53 @@ int64_t Board::score_1() {
     return metric;
 }
 
-int64_t Board::score_2() {
+int64_t Board::score_1() {
     return white_pieces->count() - black_pieces->count();
 }
 
-int64_t Board::score_3() {
-    if ( white_pieces->count() < 4 || black_pieces->count() < 4 ) {
-        return   ( (*white_pieces) & diagonal_mask ).count()
-               - ( (*black_pieces) & diagonal_mask ).count();
-    } else {
-        return 0;
+int64_t Board::score_2() {
+    int64_t metric = 0;
+    if ( white_pieces->count() < 4 || black_pieces->count() < 4) {
+        if ( (white_pieces->count() < black_pieces->count()) ) {
+            if ( (*white_pieces)[0] || (*white_pieces)[4] ) {
+                metric += 9;
+                metric -= (*black_pieces)[0]  * 3;
+                metric -= (*black_pieces)[4]  * 3;
+                metric -= (*black_pieces)[1]  * 1;
+                metric -= (*black_pieces)[5]  * 1;
+                metric -= (*black_pieces)[8]  * 1;
+                metric -= (*black_pieces)[12] * 1;
+            }
+            if ( (*white_pieces)[27] || (*white_pieces)[31] ) {
+                metric += 9;
+                metric -= (*black_pieces)[27] * 3;
+                metric -= (*black_pieces)[31] * 3;
+                metric -= (*black_pieces)[19] * 1;
+                metric -= (*black_pieces)[23] * 1;
+                metric -= (*black_pieces)[26] * 1;
+                metric -= (*black_pieces)[30] * 1;
+            }
+        }
+        if ( (black_pieces->count() < white_pieces->count()) ) {
+            if ( (*black_pieces)[0] || (*black_pieces)[4] ) {
+                metric -= 9;
+                metric += (*white_pieces)[0]  * 3;
+                metric += (*white_pieces)[4]  * 3;
+                metric += (*white_pieces)[1]  * 1;
+                metric += (*white_pieces)[5]  * 1;
+                metric += (*white_pieces)[8]  * 1;
+                metric += (*white_pieces)[12] * 1;
+            }
+            if ( (*black_pieces)[27] || (*black_pieces)[31] ) {
+                metric -= 9;
+                metric += (*white_pieces)[27] * 3;
+                metric += (*white_pieces)[31] * 3;
+                metric += (*white_pieces)[19] * 1;
+                metric += (*white_pieces)[23] * 1;
+                metric += (*white_pieces)[26] * 1;
+                metric += (*white_pieces)[30] * 1;
+            }
+        }
     }
+    return metric;
 }
