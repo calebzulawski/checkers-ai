@@ -10,6 +10,8 @@
 #include "move.h"
 #include "constants.h"
 
+constexpr std::bitset<32> Board::diagonal_mask;
+
 Board::~Board() {
     delete white_pieces;
     delete white_kings;
@@ -246,23 +248,29 @@ size_t Board::iterative_deepening(Player maximize, std::vector<Move> &moves, Mov
     size_t depth = 1;
     size_t finished = 0;
     Move m;
+    bool maxDepthHit;
     while (!trigger) {
-        alpha_beta_start(depth, maximize, moves, m, trigger);
+        maxDepthHit = alpha_beta_start(depth, maximize, moves, m, trigger);
         if (!trigger) {
             bestMove = m;
             finished = depth;
         }
-        depth++;
+
+        if (!maxDepthHit)
+            trigger = true;
+
+        depth += 2;
     }
     return finished;
 }
 
-void Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger) {
+bool Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger) {
     int64_t alpha = std::numeric_limits<int64_t>::min();
     int64_t beta = std::numeric_limits<int64_t>::max();
     int64_t best = std::numeric_limits<int64_t>::min();
+    bool maxDepthHit = false;
     for (auto move : moves) {
-        int64_t v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(maximize), trigger);
+        int64_t v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(maximize), trigger, maxDepthHit);
         if (v > best) {
             alpha = v;
             best = v;
@@ -271,11 +279,17 @@ void Board::alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &m
         if (beta <= alpha)
             break;
     }
+    return maxDepthHit;
 }
 
-int64_t Board::alpha_beta(size_t depth, int64_t alpha, int64_t beta, Player maximize, Player current, bool &trigger) {
-    if (depth == 0 || trigger)
+int64_t Board::alpha_beta(size_t depth, int64_t alpha, int64_t beta, Player maximize, Player current, bool &trigger, bool &maxDepthHit) {
+    if (trigger)
+        return 0;
+
+    if (depth == 0) {
+        maxDepthHit = true;
         return score(maximize);
+    }
     
     std::vector<Move> moves;
     possible_moves(current, moves);
@@ -289,7 +303,7 @@ int64_t Board::alpha_beta(size_t depth, int64_t alpha, int64_t beta, Player maxi
 
     if (current == maximize) {
         for (auto move : moves) {
-            int64_t v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current), trigger);
+            int64_t v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current), trigger, maxDepthHit);
             alpha = std::max(alpha, v);
             if (beta <= alpha)
                 break;
@@ -297,7 +311,7 @@ int64_t Board::alpha_beta(size_t depth, int64_t alpha, int64_t beta, Player maxi
         return alpha;
     } else {
         for (auto move : moves) {
-            int64_t v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current), trigger);
+            int64_t v = move.board->alpha_beta(depth-1, alpha, beta, maximize, other_player(current), trigger, maxDepthHit);
             beta = std::min(beta, v) ;
             if (beta <= alpha)
                 break;
@@ -308,9 +322,10 @@ int64_t Board::alpha_beta(size_t depth, int64_t alpha, int64_t beta, Player maxi
 
 int64_t Board::score(Player p) {
     int metric = 0;
-    metric += score_0() * 1e7;
-    metric += score_1() * 1e4;
-    metric += score_2() * 1e2;
+    metric += score_0() * 1e9;
+    metric += score_1() * 1e6;
+    metric += score_2() * 1e4;
+    metric += score_3() * 1e2;
 
     metric += rand() % 100;
 
@@ -344,4 +359,13 @@ int64_t Board::score_1() {
 
 int64_t Board::score_2() {
     return white_pieces->count() - black_pieces->count();
+}
+
+int64_t Board::score_3() {
+    if ( white_pieces->count() < 4 || black_pieces->count() < 4 ) {
+        return   ( (*white_pieces) & diagonal_mask ).count()
+               - ( (*black_pieces) & diagonal_mask ).count();
+    } else {
+        return 0;
+    }
 }

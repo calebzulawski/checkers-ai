@@ -171,13 +171,13 @@ void Game::takeTurn_player(std::vector<Move> &moves) {
 }
 
 void timer(bool *trigger, float searchTime) {
-    const float timeFraction = 0.95;
+    const float slackTime = 0.1;
     auto start_time = std::chrono::high_resolution_clock::now();
     while(!*trigger) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         auto end_time = std::chrono::high_resolution_clock::now();
         auto diff_time = 1e-3 * std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-        if ( diff_time > (timeFraction*searchTime) )
+        if ( diff_time > (searchTime - slackTime) )
             *trigger = true;
     }
 }

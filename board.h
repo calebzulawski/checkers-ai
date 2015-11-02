@@ -59,17 +59,20 @@ public:
 
     // AI
     size_t  iterative_deepening(Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger);
-    void    alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger);
-    int64_t alpha_beta(size_t depth, int64_t alpha, int64_t beta, Player maximize, Player current, bool &trigger);
+    bool    alpha_beta_start(size_t depth, Player maximize, std::vector<Move> &moves, Move &bestMove, bool &trigger);
+    int64_t alpha_beta(size_t depth, int64_t alpha, int64_t beta, Player maximize, Player current, bool &trigger, bool &maxDepthHit);
     int64_t score(Player p);
     inline int64_t score_0();
     inline int64_t score_1();
     inline int64_t score_2();
+    inline int64_t score_3();
 
     std::bitset<32> *white_pieces,
                     *black_pieces,
                     *white_kings,
                     *black_kings;
+
+    static constexpr std::bitset<32> diagonal_mask = std::bitset<32>(0x8CC66331);
 
 private:
 };
