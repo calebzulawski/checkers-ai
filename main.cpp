@@ -10,11 +10,11 @@
 using namespace std;
 
 int main(int argc, char *argv[]) {
-	srand (time(NULL));
-	Game game;
-	if (argc == 2) {
-		game.load(argv[1]);
-	}
-	game.prompt();
-	game.run();
+    srand (time(NULL));
+    Game game;
+    if (argc == 2) {
+        game.load(argv[1]);
+    }
+    game.prompt();
+    game.run();
 }
